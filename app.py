@@ -64,15 +64,12 @@ def home():
 
     # initialize variables
     loaded_meals = []
-    search_result_text = 'Enter the name of a food in the search bar'
 
     # retrieve search bar input from database
     food = request.args.get('search')
     if request.method == 'GET' and food is not None:
         loaded_meals = load_menu(food)
-        search_result_text = f'Results for {food}'
-        
-    return render_template('home.html', meals = loaded_meals, search_result_string = search_result_text)
+    return render_template('home.html', meals = loaded_meals, search=food)
 
 @app.route('/details', methods=['GET'])
 def details():

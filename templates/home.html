@@ -18,38 +18,46 @@
         <h2>Search</h2>
         <form class="input-con" method="GET">
             <input type="text" id="input" name="search" required>
-            <input type="submit" id="input_button" value="Search">
+            <input type="submit" id="input-button" value="Search">
         </form>
     </div>
 
     <!-- search results -->
     <div>
-        <h2> {{ search_result_string }} </h2>
-        <p margin-bottom="5px">Select a tile to see detailed view (not yet implemented)</p>
-        <div class="result-con">
-            {% set time_colors = {'Breakfast': 'orange1', 'Lunch': 'orange2', 'Dinner': 'orange3'} %}
-            {% set loc_colors = {'Kins': 'palette2', 'J2': 'palette4', 'JCL': 'palette3'} %}
-            {% set date_colors = {'Today': 'lgreen3', 'Tomorrow': 'lgreen2'} %}
-            {% for meal in meals %}
-                {% if loop.first or meal[0] != meals[loop.index0 - 1][0] %}
-                    {% if not loop.first %}</div>{% endif %}
-                    <div class="result-item">
-                        <p><span style="font-weight: bold;"><a href="{{ url_for('details', food=meal[0]) }}"> {{ meal[0] }} </a></span></p>
-                {% endif %}
-                <p class="result-item-details-con">
-                    <span style="background-color: var(--{{ date_colors.get(meal[1], 'lgreen1') }})"> {{ meal[1] }} </span> 
-                    <span style="background-color: var(--{{ time_colors.get(meal[2]) }})"> {{ meal[2] }} </span> 
-                    <span style="background-color: var(--{{ loc_colors.get(meal[3]) }})"> {{ meal[3] }} </span> 
-                </p>
-            {% endfor %}
-            </div>
-        </div>
+        {% if search is none %}
+            <h2> Enter the name of a food in the search bar </h2>
+        {% else %}
+            <h2> Results for {{ search }} </h2>
+            {% if not meals|length == 0 %}
+                <p margin-bottom="5px">Click food name for details</p>
+                <div class="result-con">
+                        {% set time_colors = {'Breakfast': 'orange1', 'Lunch': 'orange2', 'Dinner': 'orange3'} %}
+                        {% set loc_colors = {'Kins': 'palette2', 'J2': 'palette4', 'JCL': 'palette3'} %}
+                        {% set date_colors = {'Today': 'lgreen3', 'Tomorrow': 'lgreen2'} %}
+                        {% for meal in meals %}
+                            {% if loop.first or meal[0] != meals[loop.index0 - 1][0] %}
+                                {% if not loop.first %}</div>{% endif %}
+                                <div class="result-item">
+                                    <p><span style="font-weight: bold;"><a href="{{ url_for('details', food=meal[0]) }}"> {{ meal[0] }} </a></span></p>
+                            {% endif %}
+                            <p class="result-item-details-con">
+                                <span style="background-color: var(--{{ date_colors.get(meal[1], 'lgreen1') }})"> {{ meal[1] }} </span> 
+                                <span style="background-color: var(--{{ time_colors.get(meal[2]) }})"> {{ meal[2] }} </span> 
+                                <span style="background-color: var(--{{ loc_colors.get(meal[3]) }})"> {{ meal[3] }} </span> 
+                            </p>
+                        {% endfor %}
+                        </div>
+                </div>
+            {% else %}
+                <p style="font-weight: bold;"> No results found </p>
+            {% endif %}
+        {% endif %}
     </div>
 
     <!-- additional information -->
-    <div>
-        <p class="spacer"></p>
-        <p>Some information, possibly a description. or focused view to display all entries for selected food</p>
+    <div style="padding-top: 2%;">
+        <p> Menu Tracker searches the availability of food from UT Austin dining halls. 
+            You can view the code <a href="https://github.com/iyim4/menu-tracker"><strong>here</strong></a> (currently private repo) </p>
     </div>
 </body>
 

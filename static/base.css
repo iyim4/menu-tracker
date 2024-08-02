@@ -1,14 +1,35 @@
 /* Intended to be used with colors.css */
-/* CSS file for home.html */
+:root {
+    --pad1: 2px;
+    --pad2: 5px;
+    --brad1: 5px;
+    --brad2: 10px;
+}
+
 body {
     background-color: var(--gray1);
-    border-radius: 8px;
+    border-radius: var(--brad2);
     font-family: 'Lucida Sans', sans-serif;
-    font-size: x-large;
+    font-size: 120%;
+    color: red;
+}
+
+@media only screen and (min-width: 600px) {
+    body {
+        font-size: 135%;
+        color: green;
+    }
+}
+
+@media only screen and (min-width: 992px) {
+    body {
+        font-size: 150%;
+        color: blue;
+    }
 }
 
 h1 {
-    font-family: sans-serif;
+    font-family: inherit;
     font-size: 200%;
     text-align: center;
 }
@@ -23,13 +44,12 @@ div {
 }
 
 p.spacer {
-    padding-top: 2px;
-    padding-bottom: 2px;
+    margin: 20px;
 }
 
 span {
-    padding: 5px;
-    border-radius: 5px;
+    padding: var(--pad2);
+    border-radius: var(--brad1);
     display: inline-block;
 }
 
@@ -46,8 +66,30 @@ a:hover {
 }
 
 /* buttons */
-#back-button {
-    border-radius: 8px;
+button {
+    background-color: var(--gray2);
+    border-color: var(--gray4);
+    border-radius: var(--brad2);
+    font-size: 80%;
+    font-family: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+button:hover {
+    background-color: var(--gray3);
+}
+
+#input-button {
+    font-size: 125%;
+    font-family: inherit;
+}
+@media only screen and (min-width: 992px) {
+    #input-button {
+        font-size: inherit;
+    }
+}
+/* #back-button {
+    border-radius: var(--brad2);
     font-size: inherit;
     font-family: inherit;
     background-color: var(--gray2);
@@ -55,7 +97,7 @@ a:hover {
 }
 #back-button:hover {
     background-color: var(--gray3);
-}
+} */
 
 /* Search Result Containers */
 .result-con {
@@ -65,9 +107,9 @@ a:hover {
     gap: 15px;
 }
 .result-item {
-    margin: 5px;
+    margin: var(--pad2);
     padding: 0px 15px;
-    border-radius: 10px;
+    border-radius: var(--brad2);
     background-color: white;
 }
 .result-item-details-con {
@@ -78,29 +120,37 @@ a:hover {
 .details-con {
     background-color: white;
     padding: 1% 2%;
-    border-radius: 8px;
+    border-radius: var(--brad2);
 }
 
 /* Search Input */
 
 .input-con {
-    padding: 5px;
+    padding: var(--pad2);
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
 }
 #input {
     padding: 1%;
-    border-radius: 5px;
+    border-radius: var(--brad1);
     display: flex;
-    width: 50%; /* default width, grows with flex */
+    width: 100%;
     flex-grow: 1;
     font-family: 'Lucida Sans', sans-serif;
-    font-size: large;
+    font-size: inherit;
+}
+@media (min-width: 992px) {
+    #input {
+        width: 50%; /* default width, grows with flex */
+    } 
 }
 
 #input_button {
-    border-radius: 5px;
-    font-family: 'Lucida Sans', sans-serif;
-    font-size: large;
+    border-radius: var(--brad1);
+    font-family: inherit;
+    font-size: inherit;
+}
+#input-button:hover {
+    cursor: pointer;
 }
