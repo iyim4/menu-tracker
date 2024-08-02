@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Details - Menu Tracker</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='colors.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='base.css') }}">
+</head>
+
+<body>
+    <!-- title -->
+    <div>
+        <h1><a href="{{ url_for('home') }}"> Menu Tracker </a></h1>
+    </div>
+
+    <!-- back button -->
+    <div>
+        <button id="back-button" onclick="goBack()"> Back to Search </button>
+        <script> 
+            function goBack() {
+            window.history.back();
+            }
+        </script>
+    </div>
+
+    <!-- header and back button -->
+    <div>
+        <h2 color="var(--gray)"> {{ food_name }} Details </h2>
+        <p> Filters: (buttons here) </p>
+    </div>
+
+    <!-- details search results -->
+    <div class="details-con">
+        {% set time_colors = {'Breakfast': 'orange1', 'Lunch': 'orange2', 'Dinner': 'orange3'} %}
+        {% set loc_colors = {'Kins': 'palette2', 'J2': 'palette4', 'JCL': 'palette3'} %}
+        {% for meal in meals %}
+            <p class="result-item-details-con">
+                <span style="background-color: var(--lgreen1)"> {{ meal[1] }} </span> 
+                <span style="background-color: var(--{{ time_colors.get(meal[2]) }})"> {{ meal[2] }} </span> 
+                <span style="background-color: var(--{{ loc_colors.get(meal[3]) }})"> {{ meal[3] }} </span> 
+            </p>
+        {% endfor %}
+        </div>
+    </div>
+
+    <!-- additional information -->
+    <div>
+        <p class="spacer"></p>
+        <p>Some information, possibly a description. or focused view to display all entries for selected food</p>
+    </div>
+</body>
+
+</html>

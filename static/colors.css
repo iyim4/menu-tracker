@@ -1,0 +1,20 @@
+:root {
+    --gray1: #dfdfdf;
+    --gray2: #ccc;
+    --gray3: #a0a0a0;
+    --gray4: #808080;
+    --gray5: #555;
+    --lgreen1: #e4f1ec;
+    --lgreen2:  #ade0cc;
+    --lgreen3: #28dd92;
+    --orange1: rgb(253, 241, 188);
+    --orange2: #fccc96;
+    --orange3:  rgb(247, 136, 121);
+    /* Pastel Constrasting Palette 2 from Vengage
+    https://venngage.com/tools/accessible-color-palette-generator */
+    --palette1: #f194b8;
+    --palette2:  #f8b8d0;
+    --palette3: #b3c7f7;
+    --palette4: #cfebb6;
+    --palette5: #b9e192;
+}

@@ -2,21 +2,22 @@
 <html>
 
 <head>
-    <title>Menu Tracker</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css') }}">
+    <title>Home - Menu Tracker</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='colors.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='base.css') }}">
 </head>
 
 <body>
     <!-- title -->
     <div>
-        <h1>Menu Tracker Home</h1>
+        <h1><a href="{{ url_for('home') }}"> Menu Tracker</a></h1>
     </div>
 
     <!-- search bar -->
     <div>
         <h2>Search</h2>
-        <form class="input-con" method="POST">
-            <input type="text" id="input" name="food_search" required>
+        <form class="input-con" method="GET">
+            <input type="text" id="input" name="search" required>
             <input type="submit" id="input_button" value="Search">
         </form>
     </div>
@@ -26,19 +27,19 @@
         <h2> {{ search_result_string }} </h2>
         <p margin-bottom="5px">Select a tile to see detailed view (not yet implemented)</p>
         <div class="result-con">
-            {% set time_classes = {'Breakfast': 'time-b', 'Lunch': 'time-l', 'Dinner': 'time-d'} %}
-            {% set loc_classes = {'Kins': 'loc-kins', 'J2': 'loc-j2', 'JCL': 'loc-jcl'} %}
-            {% set date_classes = {'Today': 'date-today', 'Tomorrow': 'date-tmr'} %}
+            {% set time_colors = {'Breakfast': 'orange1', 'Lunch': 'orange2', 'Dinner': 'orange3'} %}
+            {% set loc_colors = {'Kins': 'palette2', 'J2': 'palette4', 'JCL': 'palette3'} %}
+            {% set date_colors = {'Today': 'lgreen3', 'Tomorrow': 'lgreen2'} %}
             {% for meal in meals %}
                 {% if loop.first or meal[0] != meals[loop.index0 - 1][0] %}
                     {% if not loop.first %}</div>{% endif %}
                     <div class="result-item">
-                        <p><span class="recipe">{{ meal[0] }}</span></p>
+                        <p><span style="font-weight: bold;"><a href="{{ url_for('details', food=meal[0]) }}"> {{ meal[0] }} </a></span></p>
                 {% endif %}
                 <p class="result-item-details-con">
-                    <span class="{{ date_classes.get(meal[1], 'date-other') }}"> {{ meal[1] }} </span> 
-                    <span class="{{ time_classes.get(meal[2]) }}"> {{ meal[2] }} </span> 
-                    <span class="{{ loc_classes.get(meal[3]) }}"> {{ meal[3] }} </span> 
+                    <span style="background-color: var(--{{ date_colors.get(meal[1], 'lgreen1') }})"> {{ meal[1] }} </span> 
+                    <span style="background-color: var(--{{ time_colors.get(meal[2]) }})"> {{ meal[2] }} </span> 
+                    <span style="background-color: var(--{{ loc_colors.get(meal[3]) }})"> {{ meal[3] }} </span> 
                 </p>
             {% endfor %}
             </div>
