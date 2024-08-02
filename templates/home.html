@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Menu Tracker</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css') }}">
+</head>
+
+<body>
+    <!-- title -->
+    <div>
+        <h1>Menu Tracker Home</h1>
+    </div>
+
+    <!-- search bar -->
+    <div>
+        <h2>Search</h2>
+        <form class="input-con" method="POST">
+            <input type="text" id="input" name="food_search" required>
+            <input type="submit" id="input_button" value="Search">
+        </form>
+    </div>
+
+    <!-- search results -->
+    <div>
+        <h2> {{ search_result_string }} </h2>
+        <p margin-bottom="5px">Select a tile to see detailed view (not yet implemented)</p>
+        <div class="result-con">
+            {% set time_classes = {'Breakfast': 'time-b', 'Lunch': 'time-l', 'Dinner': 'time-d'} %}
+            {% set loc_classes = {'Kins': 'loc-kins', 'J2': 'loc-j2', 'JCL': 'loc-jcl'} %}
+            {% set date_classes = {'Today': 'date-today', 'Tomorrow': 'date-tmr'} %}
+            {% for meal in meals %}
+                {% if loop.first or meal[0] != meals[loop.index0 - 1][0] %}
+                    {% if not loop.first %}</div>{% endif %}
+                    <div class="result-item">
+                        <p><span class="recipe">{{ meal[0] }}</span></p>
+                {% endif %}
+                <p class="result-item-details-con">
+                    <span class="{{ date_classes.get(meal[1], 'date-other') }}"> {{ meal[1] }} </span> 
+                    <span class="{{ time_classes.get(meal[2]) }}"> {{ meal[2] }} </span> 
+                    <span class="{{ loc_classes.get(meal[3]) }}"> {{ meal[3] }} </span> 
+                </p>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- additional information -->
+    <div>
+        <p class="spacer"></p>
+        <p>Some information, possibly a description. or focused view to display all entries for selected food</p>
+    </div>
+</body>
+
+</html>

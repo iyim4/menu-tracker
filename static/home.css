@@ -1,0 +1,109 @@
+/* CSS file for home.html */
+body {
+    background-color: rgb(230, 230, 230);
+    border-radius: 8px;
+    font-family: 'Lucida Sans', sans-serif;
+    font-size: x-large;
+}
+
+h1 {
+    font-family: sans-serif;
+    font-size: 200%;
+    text-align: center;
+}
+
+h2 {
+    font-size: 150%;
+}
+
+div {
+    padding: 0% 1%;
+    margin: 1%;
+}
+
+p.spacer {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+span {
+    padding: 5px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+/* Search Result Containers */
+.result-con {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+.result-item {
+    margin: 5px;
+    padding: 0px 15px;
+    border-radius: 10px;
+    background-color: white;
+}
+.result-item-details-con {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Search Results Colors */
+
+.recipe {
+    font-weight: bold;
+}
+.date-other {
+    background-color: #e4f1ec;
+}
+.date-tmr {
+    background-color: #ade0cc;
+}
+.date-today {
+    background-color: #28dd92;
+}
+.time-b {
+    background-color: rgb(253, 241, 188);
+}
+.time-l {
+    background-color: #fccc96;
+}
+.time-d {
+    background-color: rgb(247, 136, 121);
+}
+.loc-kins {
+    background-color: #f194b8;
+}
+.loc-j2 {
+    background-color: #b9e192;
+}
+.loc-jcl {
+    background-color: #b3c7f7;
+}
+
+/* Search Input */
+
+.input-con {
+    padding: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+#input {
+    padding: 1%;
+    border-radius: 5px;
+    display: flex;
+    width: 50%; /* default width, grows with flex */
+    flex-grow: 1;
+    font-family: 'Lucida Sans', sans-serif;
+    font-size: large;
+}
+
+#input_button {
+    border-radius: 5px;
+    font-family: 'Lucida Sans', sans-serif;
+    font-size: large;
+}
