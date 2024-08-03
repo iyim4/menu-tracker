@@ -10,6 +10,7 @@ from enum import Enum
 # mapping from database codes to strings
 MEALTIME_CODES = ['ERROR', 'Breakfast', 'Lunch', 'Dinner']
 LOCATION_CODES = ['ERROR', 'Kins', 'J2', 'JCL']
+DEFAULT_MFILTER = '0111111'
 class MFilters(Enum):
     NUM_FILTERS = 7
     # position of filter on filters string
@@ -79,7 +80,7 @@ def home():
     # Initialize variables
     loaded_menu = []
     food_name = request.args.get('search')
-    filters_str = request.args.get('filters', '1111111') 
+    filters_str = request.args.get('filters', DEFAULT_MFILTER) 
     # filters_str is a string that represents filter settings
     # filters are stored as a string of numbers. each digit is used to determine
     # a specific filter setting at the index corresponding to the MFilters enumeration
@@ -113,14 +114,28 @@ def details():
     """ shows historic and future availability of specific food over a large timespan """
 
     # Get args
-    filters = request.args.get('filters', '0111111') 
+    filters_str = request.args.get('filters', DEFAULT_MFILTER) 
+    filters_str = DEFAULT_MFILTER if filters_str == '' else filters_str
     food_name = request.args.get('search')
-
-    # TODO implement toggles here.
 
     # Get details
     if food_name:
-        loaded_details = load_details(food_name, filters)
+        # check if a button was clicked and update results accordingly
+        for i in range(MFilters.NUM_FILTERS.value):
+            # check which button (filter1, filter2, ...) was clicked
+            if 'filters{}'.format(i) in request.args: 
+                # toggle the specific filter option
+                filters_list = list(filters_str)
+                filters_list[i] = '0' if filters_list[i] == '1' else '1'
+                filters_str = ''.join(filters_list)
+
+                # query database with new filters
+                loaded_details = load_details(food_name, filters_str)
+
+                return render_template('details.html', menu = loaded_details, search = food_name, filters = filters_str)
+        
+        # else, initial load of details page. show details with default filter
+        loaded_details = load_details(food_name, filters_str)
     else:
         loaded_details = []
         food_name = 'Error retrieving food name'
@@ -143,7 +158,7 @@ def load_details(food_name, filters):
 
     # Get and execute the SQL query
     query = get_filtered_query(filters, food_name, True)
-    print(f'searching for {food_name} in load_menu with filters: {filters} and query {query}')
+    print(f'searching for {food_name} in load_details with filters: {filters} and query {query}')
     cursor.execute(query)
 
     # Fetch all rows
@@ -184,14 +199,14 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool):
         return f"SELECT * FROM {DB_TABLE_NAME} WHERE {recipe_select} AND [Date] >= {date} ORDER BY Recipe, [Date], Mealtime"
 
     # Base selection
-    query = [f"SELECT * FROM {DB_TABLE_NAME} WHERE {recipe_select} "]
+    query = [f"SELECT * FROM {DB_TABLE_NAME} WHERE {recipe_select}"]
 
     # Time filter
     today = datetime.today()
     if filters[MFilters.TIME.value] == f'{MFilters.TIME_SHORT.value}':
         start_date = today.strftime("%m/%d/%Y")
         end_date = (today + timedelta(days=2)).strftime("%m/%d/%Y")
-        query.append(f"[Date] BETWEEN '{start_date}' AND '{end_date}'")
+        query.append(f"([Date] BETWEEN '{start_date}' AND '{end_date}')")
     elif filters[MFilters.TIME.value] == f'{MFilters.TIME_FUTURE}':
         today = today.strftime("%m/%d/%Y")
         query.append(f"[Date] >= '{today}'")

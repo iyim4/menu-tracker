@@ -11,6 +11,7 @@ body {
     border-radius: var(--brad2);
     font-family: 'Lucida Sans', sans-serif;
     font-size: 120%;
+    color: var(--gray7);
 }
 
 @media only screen and (min-width: 600px) {
@@ -65,6 +66,7 @@ a:hover {
 /* buttons */
 button {
     background-color: var(--gray2);
+    border-style: solid;
     border-color: var(--gray4);
     border-radius: var(--brad2);
     font-size: 80%;
@@ -73,7 +75,25 @@ button {
     cursor: pointer;
 }
 button:hover {
-    background-color: var(--gray3);
+    filter: brightness(80%);
+
+}
+.filters-con {
+    display: flex;
+    flex-wrap: wrap;
+    padding: var(--pad2);
+    justify-content: left;
+    gap: var(--pad1);
+}
+.filters-button {
+    border-style: solid;
+    border-color: var(--gray3);
+    padding: var(--pad2);
+}
+@media only screen and (min-width: 600px) {
+    .filters-con {
+        gap: 3%;
+    }
 }
 
 #input-button {
@@ -85,16 +105,9 @@ button:hover {
         font-size: inherit;
     }
 }
-/* #back-button {
-    border-radius: var(--brad2);
-    font-size: inherit;
-    font-family: inherit;
+#back-button {
     background-color: var(--gray2);
-    cursor: pointer;
 }
-#back-button:hover {
-    background-color: var(--gray3);
-} */
 
 /* Search Result Containers */
 .result-con {
@@ -107,7 +120,7 @@ button:hover {
     margin: var(--pad2);
     padding: 0px 15px;
     border-radius: var(--brad2);
-    background-color: white;
+    background-color: var(--gray0);
 }
 .result-item-details-con {
     display: flex;
@@ -115,7 +128,7 @@ button:hover {
     gap: 10px;
 }
 .details-con {
-    background-color: white;
+    background-color: var(--gray0);
     padding: 1% 2%;
     border-radius: var(--brad2);
 }
@@ -147,7 +160,9 @@ button:hover {
     border-radius: var(--brad1);
     font-family: inherit;
     font-size: inherit;
+    background-color: var(--gray2);
 }
 #input-button:hover {
     cursor: pointer;
+    filter: brightness(80%);
 }

@@ -15,47 +15,75 @@
 
     <!-- back button -->
     <div>
-        <button id="back-button" onclick="goBack()"> Back to Search </button>
-        <script> 
-            function goBack() {
-                window.history.back();
-            }
-        </script>
+        {% if filters is not defined %}
+            <button id="back-button" onclick="goBack()"> Back to Search </button>
+            <script> 
+                function goBack() {
+                    window.history.back();
+                }
+            </script>
+        {% else %}
+            <button id="back-button" onclick="window.location.href='{{ url_for('home') }}'"> Back to Search </button>
+        {% endif %}
     </div>
 
     <!-- header and back button -->
+    {% set result_item_colors = {'Breakfast': 'orange1', 'Lunch': 'orange2', 'Dinner': 'orange3', 'Kins': 'palette2',
+     'J2': 'palette4', 'JCL': 'palette3', 'Today': 'lgreen3', 'Tomorrow': 'lgreen2', 'All Time': 'lgreen1'} %}
+    {% set filters_names = ['All Time', 'Breakfast', 'Lunch', 'Dinner', 'Kins', 'J2', 'JCL'] %}
     <div>
         <h2 color="var(--gray)"> {{ search }} Details </h2>
-        <!-- colors for labels -->
-        {% set result_item_colors = {'Breakfast': 'orange1', 'Lunch': 'orange2', 'Dinner': 'orange3', 
-        'Kins': 'palette2', 'J2': 'palette4', 'JCL': 'palette3', 'Today': 'lgreen3', 'Tomorrow': 'lgreen2'} %}
-        {% set filters_names = ['All Time', 'Breakfast', 'Lunch', 'Dinner', 'Kins', 'J2', 'JCL'] %}
 
         <!-- filter buttons -->
-        <p> Filters </p>
-        {% for i in range(1, 7) %}
-            <form method="GET">
-                <input type="hidden" name="search" value="{{ search }}">
-                <input type="hidden" name="filters" value="{{ filters }}">
-                <button type="submit" name="filters{{ i }}" style="background-color: 
-                var(--{{ result_item_colors.get(filters_names[i]) }})"> {{ filters_names[i] }} </button>
-                <!-- TODO change color to gray3 if toggled off -->
-            </form>
-        {% endfor %}
+        <div class="filters-con"> 
+            <span> Filters </span>
+            {% for i in range(0, 7) %}
+                <form method="GET">
+                    <input type="hidden" name="search" value="{{ search }}">
+                    <input type="hidden" name="filters" value="{{ filters }}">
+
+                    {% if filters is defined %}
+                        {% if filters[i] == '0' %}
+                            {# button is toggled off #}
+                            <button type="submit" name="filters{{ i }}" class="filters-button" 
+                                style="background-color: var(--gray3)">
+                                {{ filters_names[i] }} </button>
+                        {% else %}
+                            <button type="submit" name="filters{{ i }}" class="filters-button" 
+                                style="background-color: var(--{{ result_item_colors.get(filters_names[i]) }})">
+                                {{ filters_names[i] }} </button>
+                        {% endif %}
+                    {% else %}
+                        {# default case 'All Time' is off #}
+                        {% if i == 0 %}
+                            <button type="submit" name="filters{{ i }}" class="filters-button" 
+                                style="background-color: var(--gray3)">
+                                {{ filters_names[i] }} </button>
+                        {% else %}
+                            <button type="submit" name="filters{{ i }}" class="filters-button" 
+                                style="background-color: var(--{{ result_item_colors.get(filters_names[i]) }})">
+                                {{ filters_names[i] }} </button>
+                        {% endif %}
+                    {% endif %}
+                </form>
+            {% endfor %}
+        </div>
     </div>
 
     <!-- details search results -->
     <div class="details-con">
-        {% set time_colors = {'Breakfast': 'orange1', 'Lunch': 'orange2', 'Dinner': 'orange3'} %}
-        {% set loc_colors = {'Kins': 'palette2', 'J2': 'palette4', 'JCL': 'palette3'} %}
-        {% for entry in menu %}
-            <p class="result-item-details-con">
-                <span style="background-color: var(--lgreen1)"> {{ entry[1] }} </span> 
-                <span style="background-color: var(--{{ time_colors.get(entry[2]) }})"> {{ entry[2] }} </span> 
-                <span style="background-color: var(--{{ loc_colors.get(entry[3]) }})"> {{ entry[3] }} </span> 
-            </p>
-        {% endfor %}
-        </div>
+        {% if not menu|length == 0 %}
+            {% for entry in menu %}
+                <p class="result-item-details-con">
+                    <span style="background-color: var(--lgreen1)"> {{ entry[1] }} </span> 
+                    <span style="background-color: var(--{{ result_item_colors.get(entry[2]) }})"> {{ entry[2] }} </span> 
+                    <span style="background-color: var(--{{ result_item_colors.get(entry[3]) }})"> {{ entry[3] }} </span> 
+                </p>
+            {% endfor %}
+            </div>
+        {% else %}
+            <p style="font-weight: bold;"> No results found </p>
+        {% endif %}
     </div>
 
     <!-- additional information -->

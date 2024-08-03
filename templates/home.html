@@ -35,16 +35,25 @@
             <h2> Results for {{ search }} </h2>
 
             <!-- filter buttons -->
-            <p> Filters </p>
-            {% for i in range(1, 7) %}
-                <form method="GET">
-                    <input type="hidden" name="search" value="{{ search }}">
-                    <input type="hidden" name="filters" value="{{ filters }}">
-                    <button type="submit" name="filters{{ i }}" style="background-color: 
-                    var(--{{ result_item_colors.get(filters_names[i]) }})"> {{ filters_names[i] }} </button>
-                    <!-- TODO change color to gray3 if toggled off -->
-                </form>
-            {% endfor %}
+            <div class="filters-con"> 
+                <span> Filters </span>
+                {% for i in range(1, 7) %}
+                    <form method="GET">
+                        <input type="hidden" name="search" value="{{ search }}">
+                        <input type="hidden" name="filters" value="{{ filters }}">
+                        {% if filters is defined and filters[i] == '0' %}
+                            {# button is toggled off #}
+                            <button type="submit" name="filters{{ i }}" class="filters-button" 
+                                style="background-color: var(--gray3); border-color: var(--gray4)">
+                                {{ filters_names[i] }} </button>
+                        {% else %}
+                            <button type="submit" name="filters{{ i }}" class="filters-button" 
+                                style="background-color: var(--{{ result_item_colors.get(filters_names[i]) }})">
+                                {{ filters_names[i] }} </button>
+                        {% endif %}
+                    </form>
+                {% endfor %}
+            </div>
 
             <!-- searh results -->
             {% if not menu|length == 0 %}

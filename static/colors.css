@@ -1,9 +1,12 @@
 :root {
+    --gray0: #fff;
     --gray1: #e5e5e5;
     --gray2: #ccc;
     --gray3: #a0a0a0;
     --gray4: #808080;
     --gray5: #555;
+    --gray6: #333;
+    --gray7: #000;
     --lgreen1: #e4f1ec;
     --lgreen2:  #ade0cc;
     --lgreen3: #28dd92;
