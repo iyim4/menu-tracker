@@ -11,13 +11,11 @@ body {
     border-radius: var(--brad2);
     font-family: 'Lucida Sans', sans-serif;
     font-size: 120%;
-    color: red;
 }
 
 @media only screen and (min-width: 600px) {
     body {
         font-size: 135%;
-        color: green;
     }
 }
 
