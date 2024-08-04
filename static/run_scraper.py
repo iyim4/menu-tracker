@@ -1,24 +1,29 @@
 # run_scraper.py
 # runs webscraper to add data to database
 # currently scrapes from all 3 dining halls up to CHECK_DAYS_AHEAD days in the future
+# requires requests and BeautifulSoup4 (web scraping) and pyodbc (database connection) to be installed
 
-from datetime import datetime, timedelta
-import sys
+import logging
 import os
+import sys
+from datetime import datetime, timedelta
+from scraper import scraper_main, get_logger
 
-# Add the parent directory to the system path to import methods from searchdb
+# import methods from searchdb: Add the parent directory to the system path to access it
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-# import methods from other files
 from searchdb import LOCATION_CODES, get_connection, get_table_name, is_valid_tname
-from scraper import scraper_main
 
-CHECK_DAYS_AHEAD = 40  # number of days ahead to check from date
+# the number of days ahead from to scrape from
+CHECK_DAYS_AHEAD = 17
+
+# Set up logging
+logger = get_logger()
 
 # Get the date to begin searching from
 date = datetime.today()
-date = datetime(date.year, date.month-1, date.day+20)
+date = datetime(date.year, date.month, date.day)
 start_date = date
+logger.debug(f'Search starting from {start_date.date()} to {(date + timedelta(days=CHECK_DAYS_AHEAD)).date()}')
 
 # Connect to database
 connection = get_connection()
@@ -42,7 +47,8 @@ for i in range(0, CHECK_DAYS_AHEAD + 1):
                 Location int
             )
         ''')
-        print(f'NOTICE run_scraper.py table {table_name} was not found, created new table')
+        logger.debug(f'CREATED NEW TABLE {table_name} as it was not found')
+        # print(f'NOTICE run_scraper.py table {table_name} was not found, created new table')
 
     # add table to list of tables
     if tables == [] or tables[-1] != table_name:
@@ -50,7 +56,7 @@ for i in range(0, CHECK_DAYS_AHEAD + 1):
 
     # scrape from each dining hall location on this date
     for loc_num in range(1, 4):
-        # print(f'run_scraper.py checking {LOCATION_CODES[loc_num]} on {date.date()}')
+        logger.debug(f'Scraping from {LOCATION_CODES[loc_num]}, {date.date()}')
         scraper_main(loc_num, date, table_name, cursor)
         pass
 
@@ -62,6 +68,6 @@ for i in range(0, CHECK_DAYS_AHEAD + 1):
 connection.commit()
 connection.close()
 
-# print sucess message
-print(f'run_scraper.py successfully scraped from {start_date.date()} to {date.date()}',
-      'and stored into tables', ', '.join(tables))
+# log success
+logger.info(f'Successfully scraped from {start_date.date()} to '\
+            f'{(date - timedelta(days=1)).date()} and stored into tables {", ".join(tables)}')

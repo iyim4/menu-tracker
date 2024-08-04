@@ -1,11 +1,28 @@
 # scraper.py
 # Scrapes and stores recipes from a UT austin menu URL into database
+# requires requests and BeautifulSoup4 (web scraping) and pyodbc (database connection) to be installed
 
-from bs4 import BeautifulSoup
+import logging
+import os
+import sys
 from datetime import datetime, timedelta
-import requests
 import pyodbc
+from requests import get
+from bs4 import BeautifulSoup
+
+# import methods from searchdb: Add the parent directory to the system path to access it
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from searchdb import MEALTIME_CODES, LOCATION_CODES
+
+def get_logger(): 
+    """ returns logger that this file writes to """
+    LOG_NAME = 'scraper.log'
+    LOG_LEVEL = logging.INFO
+    current_dir = os.path.dirname(__file__)
+    log_path = os.path.join(os.path.dirname(__file__), LOG_NAME)
+    logging.basicConfig(level=LOG_LEVEL, filename=log_path, filemode='w',
+                        format="%(asctime)s [%(levelname)s] %(filename)s: %(message)s")
+    return logging.getLogger(LOG_NAME)
 
 def scraper_main(location_num: int, date: datetime, table_name: str, cursor: pyodbc.Cursor):
     """Scrapes and stores recipes from a UT austin menu URL into database
@@ -13,43 +30,47 @@ def scraper_main(location_num: int, date: datetime, table_name: str, cursor: pyo
     :location_num: of location to scrape from, must be 1, 2, or 3
     :date: to scrape from, recommended to be between 7 days ago and 14 days ahead
     :table_name: name of table in database
-    :cursor: cursor to the database
+    :cursor: cursor to the database, executes writes.  DOES NOT COMMIT WRITE
     """
+
+    logger = get_logger()
+    logger.debug(f'Attempting to scrape with location {location_num}, date {date.date()}, and table {table_name}')
 
     # validate arguments
     if not is_valid_lnum(location_num):
-        print(f'ERROR scraper.py location_num ({location_num}) is not valid. scraping cancelled from '\
-              f'{LOCATION_CODES[location_num]}, {date.date()}')
+        logger.warning(f'SCRAPE CANCELLED from {LOCATION_CODES[location_num]}, {date.date()}. '\
+                       f'Location_num ({location_num}) is not valid.')
         return
     elif not is_valid_tname(cursor, table_name):
-        print(f'ERROR scraper.py {table_name} not found in database. scraping cancelled from '\
-              f'{LOCATION_CODES[location_num]}, {date.date()}')
+        logger.warning(f'SCRAPE CANCELLED from {LOCATION_CODES[location_num]}, {date.date()}. '\
+                       f'Table ({table_name}) not found in database.')
         return 
     elif not is_valid_date(date):
-        print(f'NOTICE scraper.py date ({date.date()}) is not within recommended range, may not find data.')
+        logger.debug(f'Date ({date.date()}) is not within recommended range, may not find data.')
 
     # write only if not already scraped
     if is_scraped(cursor, table_name, location_num, date):
-        print(f'NOTICE scraper.py already scraped from {LOCATION_CODES[location_num]}, {date.date()}, '\
-              f'into {table_name}. database was not updated.')
+        logger.debug(f'SCRAPE CANCELLED from {LOCATION_CODES[location_num]}, {date.date()}. '\
+              f'Already scraped into {table_name}.')
         return
     else:
-        print(f'scraper.py begin scraping from {LOCATION_CODES[location_num]}, {date.date()}.')
+        logger.debug(f'Begin scraping from {LOCATION_CODES[location_num]}, {date.date()}.')
     
     # scrape website
     html_content = get_html_content(location_num, date)
 
     # write only if there is data available
     if html_content.find(text='No Data Available'):
-        print(f'NOTICE scraper.py No data found. scraping cancelled from '\
-              f'{LOCATION_CODES[location_num]}, {date.date()}')
+        logger.debug(f'SCRAPE CANCELLED from {LOCATION_CODES[location_num]}, {date.date()}. '\
+                       f'No recipes found on page')
         return
 
     # write to database
     write(cursor, table_name, html_content, location_num, date)
+    logger.debug('no writes occurred')
 
     # print success message
-    print(f'scraper.py successfully scraped from {LOCATION_CODES[location_num]}, {date.date()}')
+    logger.info(f'Successfully scraped and cursor-wrote from {LOCATION_CODES[location_num]}, {date.date()}')
 
 def is_valid_date(date: datetime):
     """ Returns true if date is within a valid range, between 7 days ago and 14 days ahead of today """
@@ -85,7 +106,7 @@ def get_html_content(location_num: int, date: datetime):
     )
 
     # Get HTML from website
-    html_content = requests.get(source_url).text
+    html_content = get(source_url).text
 
     # Parse and return the HTML content
     return BeautifulSoup(html_content, 'html.parser')
@@ -95,7 +116,7 @@ def write(cursor: pyodbc.Cursor, table_name: str, html_content: BeautifulSoup,
           location_num:int, date: datetime):
     """ Filters, formats, and writes html_content to file
 
-    :cursor: cursor to execute queries
+    :cursor: cursor to execute queries, DOES NOT COMMIT WRITES
     :table_name: name of table in database to write to
     :html_content: parsed html content
     :location_num: of recipes in html_content, should be 1, 2, or 3
@@ -119,11 +140,10 @@ def write(cursor: pyodbc.Cursor, table_name: str, html_content: BeautifulSoup,
             instr = f"INSERT INTO {table_name} (Recipe, [Date], Mealtime, [Location]) VALUES (?, ?, ?, ?)"
             cursor.execute(instr, recipe.text.rstrip('\xa0'), date, mealtime, location_num) 
 
-    # Print a success message
-    print(f'scraper.py Recipes from {LOCATION_CODES[location_num]} on {date.date()} has '\
+    # Log a success message
+    logger = get_logger()
+    logger.debug(f'Recipes from {LOCATION_CODES[location_num]} on {date.date()} has '\
           f'been successfully written to table {table_name}')
-    if len(menus) == 0:
-        print('NOTICE scraper.py No recipes found, so new entries were made. THIS SHOULD NOT HAPPEN WITH NEW CHECK')
 
 def is_scraped(cursor: pyodbc.Cursor, table_name: str, location_num: int, date: datetime):
     """Checks if this day and location have already been scraped into database
