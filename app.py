@@ -2,7 +2,7 @@
 # Website to search availability of foods from UT Austin dining halls
 
 from flask import Flask, request, render_template
-from searchdb import load_menu_details, load_menu_home, DEFAULT_MFILTER, MFilters, validate_filters
+from searchdb import load_menu_details, load_menu_home, DEFAULT_MFILTER, MFilters, validate_filters, recode_timefilter
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
@@ -58,23 +58,21 @@ def details():
         for i in range(MFilters.NUM_FILTERS.value):
             # check which button (filter1, filter2, ...) was clicked
             if 'filters{}'.format(i) in request.args: 
-                # toggle the specific filter option
+                # toggle the specific filter option. for time, 'add' 1 (details page special: future/all time)
                 filters_list = list(filters_str)
                 filters_list[i] = '0' if filters_list[i] == '1' else '1'
                 filters_str = ''.join(filters_list)
 
-                # recode filters (details page special: toggles between future and all time)
-                filters_list[0] = '2' if filters_list[0] == '1' else '1'
-                recoded_filters = ''.join(filters_list)
-
                 # query database with new filters
-                loaded_details = load_menu_details(food_name, recoded_filters)
+                recoded_filter = recode_timefilter(filters_str)
+                loaded_details = load_menu_details(food_name, recoded_filter)
 
                 return render_template('details.html', menu = loaded_details, search = food_name, 
                                        filters = filters_str, today_str = today_str, tmr_str = tmr_str)
         
-        # else, initial load of details page. show details with default filter
-        loaded_details = load_menu_details(food_name, filters_str)
+        # else, initial load of details page. 
+        recoded_filter = recode_timefilter(filters_str)
+        loaded_details = load_menu_details(food_name, recoded_filter)
     else:
         loaded_details = []
         food_name = 'Error retrieving food name'
