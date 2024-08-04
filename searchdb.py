@@ -1,10 +1,19 @@
-# testdef.py
-# see if putting functions in other files will work
+# searchdb.py
+# provides methods to search database for availability of foods from UT Austin dining halls
+# assumes connection details in environment variables
 
 from datetime import datetime, timedelta
+from enum import Enum
 import pyodbc
 import os
-from enum import Enum
+
+# mapping from database codes to strings
+MEALTIME_CODES = ['ERROR', 'Breakfast', 'Lunch', 'Dinner']
+LOCATION_CODES = ['ERROR', 'Kins', 'J2', 'JCL']
+
+# Meal filters are used to filter food search results
+# Filters are stored as a string of numbers. Each digit is used to determine
+# a specific filter setting at the index corresponding to the MFilters enumeration
 DEFAULT_MFILTER = '0111111'
 class MFilters(Enum):
     NUM_FILTERS = 7
@@ -22,10 +31,24 @@ class MFilters(Enum):
     TIME_ALL = 2
     TIME_SHORT_LIMIT = 3 # the number of days TIME_SHORT displays
 
-def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: pyodbc.Cursor = None):
+def get_connection():
+    """ gets connection to database from environment variables """
+    
+    # get environment variables (for connecting to database)
+    DB_SERVER_NAME = os.getenv('DB_SERVER_NAME')
+    DB_NAME = os.getenv('DB_NAME')
+    DB_USERNAME = os.getenv('DB_USERNAME')
+    DB_PASSWORD = os.getenv('DB_PASSWORD')
+
+    # Connect to database
+    connection_string = f"Driver={{ODBC Driver 18 for SQL Server}};Server=tcp:{DB_SERVER_NAME},1433;Database={DB_NAME};"\
+    f"Uid={DB_USERNAME};Pwd={DB_PASSWORD};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+    return pyodbc.connect(connection_string)
+
+def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: pyodbc.Cursor):
     """ returns SQL query string for database using filters 
 
-    :param filters: string determining selection filters
+    :param filters: string determining selection filters. assume already validated.
     :param food_name: name of food to search
     :param exact_match: determines whether to search for exact matches to food_name
     :param table_names: used for date filters
@@ -33,14 +56,19 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: 
     
     # convert to list
     filters = list(filters[:MFilters.NUM_FILTERS.value])
-    # TODO error checking. currently, assumes filter is on if number is not 0. and filter len == MFilters.NUM_FILTERS.value - 1
+
+    # handle special char ' (SQL syntax)
+    if "'" in food_name:
+        food_name = food_name.replace("'","''") 
 
     # determine whether to search for exact matches to food_name
     recipe_select = f"Recipe='{food_name}'" if exact_match else f"(Recipe LIKE '% {food_name}%' OR Recipe LIKE '{food_name}%')" 
 
+    # order clause - displays search results in order by these column values
+    order = ' ORDER BY Recipe, [Date], Mealtime'
+
     # Start building where clause (filters)
     where = [recipe_select]
-    order = ' ORDER BY Recipe, [Date], Mealtime'
 
     # Mealtime Filters
     mealtime_filters=[]
@@ -70,7 +98,7 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: 
             where.append(loc_filters)
     # else, search all locations
     
-    # Time filters
+    # Add time filters and return
     today = datetime.today()
     if filters[MFilters.TIME.value] == f'{MFilters.TIME_SHORT.value}':
         # searches to up to MFilters.TIME_SHORT_LIMIT - 1 days ahead
@@ -83,7 +111,7 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: 
             where.append(f"([Date] BETWEEN '{start_date}' AND '{end_date}')")
             return f'SELECT * from {get_table_name(today)} WHERE ' + ' AND '.join(where) + order
         else:
-            # end_date is in another month and thus table 
+            # end_date is in another month and thus table. join tables
             start_date_str = start_date.strftime("%m/%d/%Y")
             where.append(f"([Date] >= '{start_date_str})'")
             table1 = f'SELECT * from {get_table_name(start_date)} WHERE' + ' AND '.join(where)
@@ -92,6 +120,7 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: 
             end_date = end_date.strftime("%m/%d/%Y")
             where.append(f"([Date] BETWEEN '{start_date}' AND '{end_date}')")
             table2 = f'SELECT * from {get_table_name(end_date)} WHERE' + ' AND '.join(where)
+            # Union tables and return
             return f'{table1} UNION {table2} {order}'
         
     elif filters[MFilters.TIME.value] == f'{MFilters.TIME_FUTURE.value}':
@@ -107,10 +136,12 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: 
         next_month = datetime(year, month, 1)
         next_tname = get_table_name(next_month)
         if is_valid_tname(cursor, next_tname):
+            # Union next month's table
             where.pop() # remove previous date filter
             table2 = f'SELECT * from {next_tname} WHERE ' + ' AND '.join(where)
             return f'{table1} UNION {table2} {order}'
         else:
+            # no data for next month
             return f'{table1} {order}'
     
     else:
@@ -148,9 +179,108 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: 
 
 def get_table_name(date: datetime):
     """ returns table name in database for a date """
+    # table names in format (prefix)_(year)_(month)
     DB_TABLE_PREFIX = os.getenv('DB_TABLE_PREFIX')
     return f'{DB_TABLE_PREFIX}_{date.year}_{date.month}'
 
 def is_valid_tname(cursor: pyodbc.Cursor, table_name: str):
     """Returns true if table_name is a valid table name (present in database), false otherwise"""
     return cursor.tables(table=table_name, tableType='TABLE').fetchone() is not None
+
+def load_menu_home(food_name: str, filters: str): 
+    """ load all filtered search results for food from database in HOME PAGE format 
+
+    :param food_name: name of food to search
+    :param filters: string representing filter settings
+    """
+    # validate filters
+    filters = validate_filters(filters, False)
+    
+    # Connect to database
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    # Get and execute the SQL query
+    query = get_filtered_query(filters, food_name, False, cursor)
+    print(f'load_menu_home searching for {food_name} with filters {filters} and query {query}')
+    cursor.execute(query)
+
+    # Fetch all rows
+    rows = cursor.fetchall()
+
+    # Extract data and store into a list, HOME PAGE FORMAT
+    loaded_menu = []
+    today = datetime.today()
+    today = datetime(today.year, today.month, today.day)
+    tomorrow = today + timedelta(days=1)
+    for row in rows:
+        date = row.Date
+        date = 'Today' if date == today else ('Tomorrow' if date == tomorrow else f'{date.strftime("%A")}')
+        loaded_menu.append([row.Recipe, date, MEALTIME_CODES[row.Mealtime], LOCATION_CODES[row.Location]])
+
+    # Close the connection
+    connection.close()
+    print('load_menu_home completed sucessfully')
+    
+    return loaded_menu
+
+def load_menu_details(food_name, filters):
+    """ load filtered details for single food from database in DETAILS PAGE format 
+
+    :param food_name: name of food to search
+    :param filters: string representing filter settings
+    """
+    # validate filters
+    filters = validate_filters(filters, True)
+
+    # Connect to database
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    # Get and execute the SQL query
+    query = get_filtered_query(filters, food_name, True, cursor)
+    print(f'load_menu_details searching for {food_name} with filters {filters} and query {query}')
+    cursor.execute(query)
+
+    # Fetch all rows
+    rows = cursor.fetchall()
+
+    # Extract data and store into a list, DETAILS PAGE FORMAT
+    loaded_details = []
+    for row in rows:
+        date = row.Date.strftime("%d %B '%y").lstrip('0')
+        loaded_details.append([row.Recipe, date, MEALTIME_CODES[row.Mealtime], LOCATION_CODES[row.Location]])
+
+    # Close the connection
+    connection.close()
+    print('load_menu_details completed sucessfully')
+    
+    return loaded_details
+
+def validate_filters(filters_str: str, is_details_page: bool):
+    """ checks that filters contains valid values, and returns corrected value otherwise 
+    
+    :param filters_str: the filter string to check
+    :param is_details_page: if current route is /details
+    """
+
+    # special case if empty
+    if filters_str == '':
+        return DEFAULT_MFILTER
+    
+    # convert to list
+    filters = list(filters_str[:MFilters.NUM_FILTERS.value])
+
+    # add filters if necessary (assume included)
+    while len(filters) < MFilters.NUM_FILTERS.value:
+        filters.append('1')
+
+    # check each digit is 0 or 1, or 2 for TIME
+    for index in range(MFilters.NUM_FILTERS.value):
+        digit = f'{filters[index]}'
+        if digit != '0' and digit != '1':
+            if not(is_details_page and index == MFilters.TIME.value and digit == '2'):
+                filters[index] = '1'
+
+    # return as string
+    return ''.join(filters)
