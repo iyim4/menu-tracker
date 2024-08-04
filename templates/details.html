@@ -29,7 +29,7 @@
 
     <!-- header and back button -->
     {% set result_item_colors = {'Breakfast': 'orange1', 'Lunch': 'orange2', 'Dinner': 'orange3', 'Kins': 'palette2',
-     'J2': 'palette4', 'JCL': 'palette3', 'Today': 'lgreen3', 'Tomorrow': 'lgreen2', 'All Time': 'lgreen1'} %}
+     'J2': 'palette4', 'JCL': 'palette3', today_str: 'lgreen3', tmr_str: 'lgreen2', 'All Time': 'lgreen1'} %}
     {% set filters_names = ['All Time', 'Breakfast', 'Lunch', 'Dinner', 'Kins', 'J2', 'JCL'] %}
     <div>
         <h2> {{ search }} Details </h2>
@@ -73,7 +73,7 @@
         {% if not menu|length == 0 %}
             {% for entry in menu %}
                 <p class="result-item-details-con">
-                    <span style="background-color: var(--lgreen1)"> {{ entry[1] }} </span> 
+                    <span style="background-color: var(--{{ result_item_colors.get(entry[1], 'lgreen1') }})"> {{ entry[1] }} </span> 
                     <span style="background-color: var(--{{ result_item_colors.get(entry[2]) }})"> {{ entry[2] }} </span> 
                     <span style="background-color: var(--{{ result_item_colors.get(entry[3]) }})"> {{ entry[3] }} </span> 
                 </p>
