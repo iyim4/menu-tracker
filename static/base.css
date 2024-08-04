@@ -102,14 +102,17 @@ button:hover {
     align-items: center;
     border-style: solid;
     border-color: var(--gray4);
+    min-height: 2.25em;
 }
 .filters-in:after {
     content: '✕';
-    margin-left: var(--pad2);
+    font-weight: bold;
+    margin-left: var(--pad3);
 }
 .filters-out {
     background-color: var(--gray0);
     border-color: var(--gray4);
+    min-height: 2.25em;
 }
 
 /* other buttons */
