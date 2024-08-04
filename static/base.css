@@ -30,6 +30,9 @@ h1 {
     font-family: inherit;
     font-size: 200%;
     text-align: center;
+    border-radius: var(--brad2);
+    background-color: var(--gray0);
+    padding: 1%
 }
 
 h2 {
@@ -67,8 +70,8 @@ a:hover {
 button {
     background-color: var(--gray2);
     border-style: solid;
-    border-color: var(--gray4);
     border-radius: var(--brad2);
+    border-width: var(--pad2);
     font-size: 80%;
     font-family: inherit;
     color: inherit;
@@ -76,7 +79,6 @@ button {
 }
 button:hover {
     filter: brightness(80%);
-
 }
 .filters-con {
     display: flex;
@@ -87,7 +89,7 @@ button:hover {
 }
 .filters-button {
     border-style: solid;
-    border-color: var(--gray3);
+    border-color: var(--gray0);
     padding: var(--pad2);
 }
 @media only screen and (min-width: 600px) {
@@ -97,16 +99,27 @@ button:hover {
 }
 
 #input-button {
-    font-size: 125%;
+    /* font-size: 125%; */
     font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background-color: var(--gray2);
+    border-color: var(--gray4);
+    border-radius: var(--brad2);
 }
 @media only screen and (min-width: 992px) {
     #input-button {
         font-size: inherit;
     }
 }
+#input-button:hover {
+    cursor: pointer;
+    filter: brightness(80%);
+}
+
 #back-button {
     background-color: var(--gray2);
+    border-color: var(--gray4);
 }
 
 /* Search Result Containers */
@@ -127,42 +140,29 @@ button:hover {
     flex-wrap: wrap;
     gap: 10px;
 }
-.details-con {
+.details-result-con {
     background-color: var(--gray0);
     padding: 1% 2%;
     border-radius: var(--brad2);
 }
 
 /* Search Input */
-
 .input-con {
     padding: var(--pad2);
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
 }
-#input {
+#input-search {
     padding: 1%;
     border-radius: var(--brad1);
-    display: flex;
     width: 100%;
     flex-grow: 1;
     font-family: 'Lucida Sans', sans-serif;
     font-size: inherit;
 }
 @media (min-width: 992px) {
-    #input {
+    #input-search {
         width: 50%; /* default width, grows with flex */
     } 
-}
-
-#input_button {
-    border-radius: var(--brad1);
-    font-family: inherit;
-    font-size: inherit;
-    background-color: var(--gray2);
-}
-#input-button:hover {
-    cursor: pointer;
-    filter: brightness(80%);
 }

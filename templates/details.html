@@ -46,7 +46,7 @@
                         {% if filters[i] == '0' %}
                             {# button is toggled off #}
                             <button type="submit" name="filters{{ i }}" class="filters-button" 
-                                style="background-color: var(--gray3)">
+                                style="background-color: var(--gray3); border-color: var(--gray5);">
                                 {{ filters_names[i] }} </button>
                         {% else %}
                             <button type="submit" name="filters{{ i }}" class="filters-button" 
@@ -57,7 +57,7 @@
                         {# default case 'All Time' is off #}
                         {% if i == 0 %}
                             <button type="submit" name="filters{{ i }}" class="filters-button" 
-                                style="background-color: var(--gray3)">
+                                style="background-color: var(--gray3); border-color: var(--gray5);">
                                 {{ filters_names[i] }} </button>
                         {% else %}
                             <button type="submit" name="filters{{ i }}" class="filters-button" 
@@ -71,7 +71,7 @@
     </div>
 
     <!-- details search results -->
-    <div class="details-con">
+    <div class="details-result-con">
         {% if not menu|length == 0 %}
             {% for entry in menu %}
                 <p class="result-item-details-con">

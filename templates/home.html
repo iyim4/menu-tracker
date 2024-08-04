@@ -17,7 +17,7 @@
     <div>
         <h2>Search</h2>
         <form class="input-con" method="GET">
-            <input type="text" id="input" name="search" required>
+            <input type="text" id="input-search" name="search" required>
             <input type="submit" id="input-button" value="Search">
         </form>
     </div>
@@ -44,7 +44,7 @@
                         {% if filters is defined and filters[i] == '0' %}
                             {# button is toggled off #}
                             <button type="submit" name="filters{{ i }}" class="filters-button" 
-                                style="background-color: var(--gray3); border-color: var(--gray4)">
+                                style="background-color: var(--gray3); border-color: var(--gray6)">
                                 {{ filters_names[i] }} </button>
                         {% else %}
                             <button type="submit" name="filters{{ i }}" class="filters-button" 

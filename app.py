@@ -25,13 +25,14 @@ class MFilters(Enum):
     TIME_SHORT = 0
     TIME_FUTURE = 1
     TIME_ALL = 2
+    TIME_SHORT_LIMIT = 3 # the number of days TIME_SHORT displays
 
 # get environment variables (for connecting to database)
 DB_SERVER_NAME = os.getenv('DB_SERVER_NAME')
 DB_NAME = os.getenv('DB_NAME')
 DB_USERNAME = os.getenv('DB_USERNAME')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_TABLE_NAME = os.getenv('DB_TABLE_NAME') # temporary. will implement date searches later.
+DB_TABLE_PREFIX = os.getenv('DB_TABLE_PREFIX')
 
 app = Flask(__name__)
 
@@ -104,7 +105,6 @@ def home():
         
         # search bar (preserves last filter setting)
         loaded_menu = load_menu(food_name, filters_str)
-        # print(loaded_menu)
 
     # default, user has not searched yet
     return render_template('home.html', menu = loaded_menu, search = food_name, filters = filters_str)
@@ -129,8 +129,12 @@ def details():
                 filters_list[i] = '0' if filters_list[i] == '1' else '1'
                 filters_str = ''.join(filters_list)
 
+                # recode filters (details page special: toggle between future and all time)
+                filters_list[0] = '2' if filters_list[0] == '1' else '1'
+                recoded_filters = ''.join(filters_list)
+
                 # query database with new filters
-                loaded_details = load_details(food_name, filters_str)
+                loaded_details = load_details(food_name, recoded_filters)
 
                 return render_template('details.html', menu = loaded_details, search = food_name, filters = filters_str)
         
@@ -157,7 +161,7 @@ def load_details(food_name, filters):
     # TODO ensure that table has correct format (my menu format)
 
     # Get and execute the SQL query
-    query = get_filtered_query(filters, food_name, True)
+    query = get_filtered_query(filters, food_name, True, cursor)
     print(f'searching for {food_name} in load_details with filters: {filters} and query {query}')
     cursor.execute(query)
 
@@ -176,41 +180,25 @@ def load_details(food_name, filters):
     
     return loaded_details
 
-def get_filtered_query(filters: str, food_name: str, exact_match: bool):
+def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: pyodbc.Cursor = None):
     """ returns SQL query string for database using filters 
 
     :param filters: string determining selection filters
     :param food_name: name of food to search
     :param exact_match: determines whether to search for exact matches to food_name
+    :param table_names: used for date filters
     """
     
     # convert to list
     filters = list(filters[:MFilters.NUM_FILTERS.value])
-    # TODO error checking. currently, assumes filter is on if number is not 0
+    # TODO error checking. currently, assumes filter is on if number is not 0. and filter len == MFilters.NUM_FILTERS.value - 1
 
     # determine whether to search for exact matches to food_name
     recipe_select = f"Recipe='{food_name}'" if exact_match else f"(Recipe LIKE '% {food_name}%' OR Recipe LIKE '{food_name}%')" 
 
-    # special, default cases
-    if filters == [f'{MFilters.TIME_ALL.value}', '1', '1', '1', '1', '1', '1']:
-        return f"SELECT * FROM {DB_TABLE_NAME} WHERE {recipe_select} ORDER BY Recipe, [Date], Mealtime"
-    elif filters == [f'{MFilters.TIME_FUTURE.value}', '1', '1', '1', '1', '1', '1']:
-        date = datetime.today().strftime("%m/%d/%Y")
-        return f"SELECT * FROM {DB_TABLE_NAME} WHERE {recipe_select} AND [Date] >= {date} ORDER BY Recipe, [Date], Mealtime"
-
-    # Base selection
-    query = [f"SELECT * FROM {DB_TABLE_NAME} WHERE {recipe_select}"]
-
-    # Time filter
-    today = datetime.today()
-    if filters[MFilters.TIME.value] == f'{MFilters.TIME_SHORT.value}':
-        start_date = today.strftime("%m/%d/%Y")
-        end_date = (today + timedelta(days=2)).strftime("%m/%d/%Y")
-        query.append(f"([Date] BETWEEN '{start_date}' AND '{end_date}')")
-    elif filters[MFilters.TIME.value] == f'{MFilters.TIME_FUTURE}':
-        today = today.strftime("%m/%d/%Y")
-        query.append(f"[Date] >= '{today}'")
-    # else, search all time
+    # Start building where clause (filters)
+    where = [recipe_select]
+    order = ' ORDER BY Recipe, [Date], Mealtime'
 
     # Mealtime Filters
     mealtime_filters=[]
@@ -223,26 +211,106 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool):
             mealtime_filters.append(f'Mealtime=3')
         if mealtime_filters != []:
             mealtime_filters = f'({" OR ".join(mealtime_filters)})'
-            query.append(mealtime_filters)
+            where.append(mealtime_filters)
     # else, search all mealtimes
 
     # Location filters
-    loc_fil = []
+    loc_filters = []
     if not ('1' == filters[MFilters.KINS.value] == filters[MFilters.J2.value] == filters[MFilters.JCL.value]):
         if filters[MFilters.KINS.value] == '1':
-            loc_fil.append(f'Location=1')
+            loc_filters.append(f'Location=1')
         if filters[MFilters.J2.value] == '1':
-            loc_fil.append(f'Location=2')
+            loc_filters.append(f'Location=2')
         if filters[MFilters.JCL.value] == '1':
-            loc_fil.append(f'Location=3')
-        if loc_fil != []:
-            loc_fil = f'({" OR ".join(loc_fil)})'
-            query.append(loc_fil)
+            loc_filters.append(f'Location=3')
+        if loc_filters != []:
+            loc_filters = f'({" OR ".join(loc_filters)})'
+            where.append(loc_filters)
     # else, search all locations
+    
+    # Time filters
+    today = datetime.today()
+    if filters[MFilters.TIME.value] == f'{MFilters.TIME_SHORT.value}':
+        # searches to up to MFilters.TIME_SHORT_LIMIT - 1 days ahead
+        start_date = today
+        end_date = (today + timedelta(days=MFilters.TIME_SHORT_LIMIT.value - 1))
+        if start_date.month == end_date.month:
+            # both dates are in same month
+            start_date = start_date.strftime("%m/%d/%Y")
+            end_date = end_date.strftime("%m/%d/%Y")
+            where.append(f"([Date] BETWEEN '{start_date}' AND '{end_date}')")
+            return f'SELECT * from {get_table_name(today)} WHERE ' + ' AND '.join(where) + order
+        else:
+            # end_date is in another month and thus table 
+            start_date_str = start_date.strftime("%m/%d/%Y")
+            where.append(f"([Date] >= '{start_date_str})'")
+            table1 = f'SELECT * from {get_table_name(start_date)} WHERE' + ' AND '.join(where)
+            where.pop() # remove previous date filter
+            start_date = start_date.strftime("%m/%d/%Y")
+            end_date = end_date.strftime("%m/%d/%Y")
+            where.append(f"([Date] BETWEEN '{start_date}' AND '{end_date}')")
+            table2 = f'SELECT * from {get_table_name(end_date)} WHERE' + ' AND '.join(where)
+            return f'{table1} UNION {table2} {order}'
+        
+    elif filters[MFilters.TIME.value] == f'{MFilters.TIME_FUTURE.value}':
+        # searches everything after start date
+        start_date = today
+        today_str = today.strftime("%m/%d/%Y")
+        where.append(f"([Date] >= '{today_str}')")
+        table1 = f'SELECT * from {get_table_name(today)} WHERE ' + ' AND '.join(where)
 
-    # combine query elements to form full query
-    query = ' AND '.join(query) + ' ORDER BY Recipe, [Date], Mealtime'
-    return query
+        # check there is data for next month
+        month = start_date.month + 1 if start_date.month != 12 else 1
+        year = start_date.year if month != 1 else start_date.year + 1
+        next_month = datetime(year, month, 1)
+        next_tname = get_table_name(next_month)
+        if is_valid_tname(cursor, next_tname):
+            where.pop() # remove previous date filter
+            table2 = f'SELECT * from {next_tname} WHERE ' + ' AND '.join(where)
+            return f'{table1} UNION {table2} {order}'
+        else:
+            return f'{table1} {order}'
+    
+    else:
+        # searches all time
+        today = datetime.today()
+        start_date = datetime(2024, 7, 1) # database won't contain any data before july 2024
+        end_date = datetime(today.year, today.month, 1)
+        temp_date = start_date
+
+        # build list of tables to search
+        tables = []
+
+        # add past tables
+        while not(temp_date.year == end_date.year and temp_date.month == end_date.month):
+            tables.append(get_table_name(temp_date))
+            month = temp_date.month + 1 if temp_date.month != 12 else 1
+            year = temp_date.year if month != 1 else temp_date.year + 1
+            temp_date = datetime(year, month, 1)
+
+        # add this month's table
+        tables.append(get_table_name(temp_date))
+
+        # add next month's table if available
+        month = end_date.month + 1 if end_date.month != 12 else 1
+        year = end_date.year if month != 1 else end_date.year + 1
+        next_month = datetime(year, month, 1)
+        next_tname = get_table_name(next_month)
+        if is_valid_tname(cursor, next_tname):
+            tables.append(next_tname)
+
+        # combine query elements to form full query
+        where = ' AND '.join(where)
+        query = [f'SELECT * from {table} WHERE {where}' for table in tables]
+        return ' UNION '.join(query) + order
+
+def get_table_name(date: datetime):
+    """ returns table name in database for a date """
+    return f'{DB_TABLE_PREFIX}_{date.year}_{date.month}'
+
+def is_valid_tname(cursor: pyodbc.Cursor, table_name: str):
+    """Returns true if table_name is a valid table name (present in database), false otherwise"""
+    return cursor.tables(table=table_name, tableType='TABLE').fetchone() is not None
 
 # for running locally
 if __name__ == '__main__':
