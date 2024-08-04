@@ -101,14 +101,14 @@ button:hover {
     display: flex;
     align-items: center;
     border-style: solid;
-    border-color: var(--gray3);
+    border-color: var(--gray4);
 }
 .filters-in:after {
     content: '✕';
     margin-left: var(--pad2);
 }
 .filters-out {
-    background-color: var(--gray3);
+    background-color: var(--gray0);
     border-color: var(--gray4);
 }
 
