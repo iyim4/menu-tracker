@@ -32,7 +32,7 @@
      'J2': 'palette4', 'JCL': 'palette3', 'Today': 'lgreen3', 'Tomorrow': 'lgreen2', 'All Time': 'lgreen1'} %}
     {% set filters_names = ['All Time', 'Breakfast', 'Lunch', 'Dinner', 'Kins', 'J2', 'JCL'] %}
     <div>
-        <h2 color="var(--gray)"> {{ search }} Details </h2>
+        <h2> {{ search }} Details </h2>
 
         <!-- filter buttons -->
         <div class="filters-con"> 
@@ -44,23 +44,21 @@
 
                     {% if filters is defined %}
                         {% if filters[i] == '0' %}
-                            {# button is toggled off #}
-                            <button type="submit" name="filters{{ i }}" class="filters-button" 
-                                style="background-color: var(--gray3); border-color: var(--gray5);">
+                            {# filter out results #}
+                            <button type="submit" name="filters{{ i }}" class="filters-out">
                                 {{ filters_names[i] }} </button>
                         {% else %}
-                            <button type="submit" name="filters{{ i }}" class="filters-button" 
+                            <button type="submit" name="filters{{ i }}" class="filters-in" 
                                 style="background-color: var(--{{ result_item_colors.get(filters_names[i]) }})">
                                 {{ filters_names[i] }} </button>
                         {% endif %}
                     {% else %}
                         {# default case 'All Time' is off #}
                         {% if i == 0 %}
-                            <button type="submit" name="filters{{ i }}" class="filters-button" 
-                                style="background-color: var(--gray3); border-color: var(--gray5);">
+                            <button type="submit" name="filters{{ i }}" class="filters-out">
                                 {{ filters_names[i] }} </button>
                         {% else %}
-                            <button type="submit" name="filters{{ i }}" class="filters-button" 
+                            <button type="submit" name="filters{{ i }}" class="filters-in" 
                                 style="background-color: var(--{{ result_item_colors.get(filters_names[i]) }})">
                                 {{ filters_names[i] }} </button>
                         {% endif %}

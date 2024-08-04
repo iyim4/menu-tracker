@@ -1,25 +1,26 @@
 /* Intended to be used with colors.css */
 :root {
-    --pad1: 2px;
+    --pad1: 3px;
     --pad2: 5px;
+    --pad3: 10px;
+    --pad4: 15px;
     --brad1: 5px;
     --brad2: 10px;
 }
 
 body {
-    background-color: var(--gray1);
-    border-radius: var(--brad2);
     font-family: 'Lucida Sans', sans-serif;
     font-size: 120%;
     color: var(--gray7);
+    background-color: var(--gray1);
+    border-radius: var(--brad2);
+    overflow-wrap: anywhere;
 }
-
 @media only screen and (min-width: 600px) {
     body {
         font-size: 135%;
     }
 }
-
 @media only screen and (min-width: 992px) {
     body {
         font-size: 150%;
@@ -30,8 +31,8 @@ h1 {
     font-family: inherit;
     font-size: 200%;
     text-align: center;
-    border-radius: var(--brad2);
     background-color: var(--gray0);
+    border-radius: var(--brad2);
     padding: 1%
 }
 
@@ -44,14 +45,9 @@ div {
     margin: 1%;
 }
 
-p.spacer {
-    margin: 20px;
-}
-
 span {
     padding: var(--pad2);
     border-radius: var(--brad1);
-    display: inline-block;
 }
 
 /* hyperlinks */
@@ -68,38 +64,56 @@ a:hover {
 
 /* buttons */
 button {
-    background-color: var(--gray2);
-    border-style: solid;
-    border-radius: var(--brad2);
-    border-width: var(--pad2);
     font-size: 80%;
     font-family: inherit;
     color: inherit;
+    background-color: var(--gray2);
+    border-style: solid;
+    border-radius: var(--brad2);
+    border-width: var(--pad1);
     cursor: pointer;
 }
 button:hover {
     filter: brightness(80%);
 }
-.filters-con {
-    display: flex;
-    flex-wrap: wrap;
-    padding: var(--pad2);
-    justify-content: left;
-    gap: var(--pad1);
-}
-.filters-button {
-    border-style: solid;
-    border-color: var(--gray0);
-    padding: var(--pad2);
-}
 @media only screen and (min-width: 600px) {
-    .filters-con {
-        gap: 3%;
+    .button {
+        border-width: var(--pad3);    
+        gap: var(--pad2);
     }
 }
 
+/* filter buttons */
+.filters-con {
+    justify-content: left;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: var(--pad2);
+    gap: var(--pad1);
+}
+@media only screen and (min-width: 600px) {
+    .filters-con {
+        gap: var(--pad2);
+    }
+}
+.filters-in {
+    display: flex;
+    align-items: center;
+    border-style: solid;
+    border-color: var(--gray3);
+}
+.filters-in:after {
+    content: '✕';
+    margin-left: var(--pad2);
+}
+.filters-out {
+    background-color: var(--gray3);
+    border-color: var(--gray4);
+}
+
+/* other buttons */
 #input-button {
-    /* font-size: 125%; */
     font-family: inherit;
     font-size: inherit;
     color: inherit;
@@ -107,16 +121,10 @@ button:hover {
     border-color: var(--gray4);
     border-radius: var(--brad2);
 }
-@media only screen and (min-width: 992px) {
-    #input-button {
-        font-size: inherit;
-    }
-}
 #input-button:hover {
     cursor: pointer;
     filter: brightness(80%);
 }
-
 #back-button {
     background-color: var(--gray2);
     border-color: var(--gray4);
@@ -127,42 +135,42 @@ button:hover {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 15px;
-}
-.result-item {
-    margin: var(--pad2);
-    padding: 0px 15px;
-    border-radius: var(--brad2);
-    background-color: var(--gray0);
-}
-.result-item-details-con {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    gap: var(--pad4);
 }
 .details-result-con {
     background-color: var(--gray0);
     padding: 1% 2%;
     border-radius: var(--brad2);
 }
+.result-item {
+    margin: var(--pad2);
+    padding: 0px var(--pad4);
+    border-radius: var(--brad2);
+    background-color: var(--gray0);
+}
+.result-item-details-con {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--pad3);
+}
 
 /* Search Input */
 .input-con {
-    padding: var(--pad2);
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    padding: var(--pad2);
+    gap: var(--pad3);
 }
 #input-search {
-    padding: 1%;
-    border-radius: var(--brad1);
-    width: 100%;
-    flex-grow: 1;
     font-family: 'Lucida Sans', sans-serif;
     font-size: inherit;
+    width: 100%;
+    flex-grow: 1;
+    padding: var(--pad2);
+    border-radius: var(--brad1);
 }
 @media (min-width: 992px) {
     #input-search {
-        width: 50%; /* default width, grows with flex */
+        width: 50%; /* grows with flex */
     } 
 }
