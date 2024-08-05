@@ -3,7 +3,6 @@
 # currently scrapes from all 3 dining halls up to CHECK_DAYS_AHEAD days in the future
 # requires requests and BeautifulSoup4 (web scraping) and pyodbc (database connection) to be installed
 
-import logging
 import os
 import sys
 from datetime import datetime, timedelta
@@ -48,7 +47,6 @@ for i in range(0, CHECK_DAYS_AHEAD + 1):
             )
         ''')
         logger.debug(f'CREATED NEW TABLE {table_name} as it was not found')
-        # print(f'NOTICE run_scraper.py table {table_name} was not found, created new table')
 
     # add table to list of tables
     if tables == [] or tables[-1] != table_name:
@@ -58,7 +56,6 @@ for i in range(0, CHECK_DAYS_AHEAD + 1):
     for loc_num in range(1, 4):
         logger.debug(f'Scraping from {LOCATION_CODES[loc_num]}, {date.date()}')
         scraper_main(loc_num, date, table_name, cursor)
-        pass
 
     # get next date and table_name
     date = date + timedelta(days=1)

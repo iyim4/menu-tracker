@@ -224,7 +224,7 @@ def load_menu_home(food_name: str, filters: str):
     
     return loaded_menu
 
-def load_menu_details(food_name, filters):
+def load_menu_details(food_name: str, filters: str):
     """ load filtered details for single food from database in DETAILS PAGE format 
 
     :param food_name: name of food to search
