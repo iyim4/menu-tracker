@@ -17,7 +17,7 @@ I would often miss the times when my favorite food, brisket, was served at the d
 * Python: pyodbc, requests, and BeautifulSoup
 
 ## Brief Overview
-See [Overview](#OVERVIEW.md) for a description of how each service is used in each part.
+See [Overview](#OVERVIEW) for a description of how each service is used in each part.
 ### Web Scraping
 * Get HTML file of webpage
 * Extract data
