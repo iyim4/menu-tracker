@@ -84,6 +84,16 @@ def get_datestr(date: datetime):
     """ returns date in details page format """
     return date.strftime("%d %B '%y").lstrip('0')
 
+@app.errorhandler(404)
+def not_found(e):
+    message = 'Page Not Found'
+    return render_template('error.html', message=message)
+
+@app.errorhandler(500)
+def not_found(e):
+    message = 'Error connecting to or searching database'
+    return render_template('error.html', message=message)
+
 # for running locally
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

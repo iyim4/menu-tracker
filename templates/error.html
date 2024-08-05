@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Details - Menu Tracker</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='colors.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='base.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <!-- title -->
+    <div>
+        <h1><a href="{{ url_for('home') }}"> Menu Tracker </a></h1>
+    </div>
+
+    <!-- back button -->
+    <div style="font-size: 200%;">
+        <button id="back-button" onclick="goBack()"> Go Back </button>
+        <script> 
+            function goBack() {
+                window.history.back();
+            }
+        </script>
+    </div>
+
+    <div>
+        <h2> Uh Oh! {{ message}} </h2>
+    </div>
+
+    <!-- additional information -->
+    <div>
+        <p> Menu Tracker searches the availability of food from UT Austin dining halls. 
+            You can view the code <a href="https://github.com/iyim4/menu-tracker"><strong>here</strong></a> (currently private repo) </p>
+    </div>
+</body>
+
+</html>
