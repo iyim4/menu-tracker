@@ -27,7 +27,7 @@ start_date = date
 logger.debug(f'Search starting from {start_date.date()} to {(date + timedelta(days=CHECK_DAYS_AHEAD)).date()}')
 
 # Connect to database
-connection_string = f"Driver={{ODBC Driver 18 for SQL Server}};Server=tcp:{CONNECTION_INFO.DB_SERVER_NAME},1433;Database={DB_NAME};"\
+connection_string = f"Driver={{ODBC Driver 18 for SQL Server}};Server=tcp:{CONNECTION_INFO.DB_SERVER_NAME},1433;Database={CONNECTION_INFO.DB_NAME};"\
 f"Uid={CONNECTION_INFO.DB_USERNAME};Pwd={CONNECTION_INFO.DB_PASSWORD};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
 connection = pyodbc.connect(connection_string)
 cursor = connection.cursor()
