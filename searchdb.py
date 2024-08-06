@@ -284,10 +284,3 @@ def validate_filters(filters_str: str, is_details_page: bool):
 
     # return as string
     return ''.join(filters)
-
-def recode_timefilter(filters_str: str):
-    """ recodes time filter in filters_str for details page """
-    filters_list = list(filters_str)
-    # 'adds' one
-    filters_list[0] = '1' if filters_list[0] == '0' else '2'
-    return ''.join(filters_list)
