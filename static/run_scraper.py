@@ -6,11 +6,13 @@
 import os
 import sys
 from datetime import datetime, timedelta
+import pyodbc 
 from scraper import scraper_main, get_logger
+from db_connection_info import CONNECTION_INFO # file ON MY COMPUTER storing login credentials
 
 # import methods from searchdb: Add the parent directory to the system path to access it
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from searchdb import LOCATION_CODES, get_connection, get_table_name, is_valid_tname
+from searchdb import LOCATION_CODES, get_table_name, is_valid_tname
 
 # the number of days ahead from to scrape from
 CHECK_DAYS_AHEAD = 17
@@ -25,7 +27,9 @@ start_date = date
 logger.debug(f'Search starting from {start_date.date()} to {(date + timedelta(days=CHECK_DAYS_AHEAD)).date()}')
 
 # Connect to database
-connection = get_connection()
+connection_string = f"Driver={{ODBC Driver 18 for SQL Server}};Server=tcp:{CONNECTION_INFO.DB_SERVER_NAME},1433;Database={DB_NAME};"\
+f"Uid={CONNECTION_INFO.DB_USERNAME};Pwd={CONNECTION_INFO.DB_PASSWORD};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+connection = pyodbc.connect(connection_string)
 cursor = connection.cursor()
 
 # get first table
