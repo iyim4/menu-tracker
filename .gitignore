@@ -2,3 +2,5 @@ testapp.py
 tester.py
 __pycache__
 temp.html
+scraper.log
+db_connection_info.py
