@@ -11,14 +11,16 @@ app = Flask(__name__)
 def home():
     """ home page that includes searching """
 
-    # Initialize variables and get arguements from requests
+    # Initialize variables and get arguments from requests
     loaded_menu = []  # stores foods and availability information
-    food_name = request.args.get('search', '')  # user input, food to search for
-    filters_str = request.args.get('filters', MFilters.get_default_filter())  # search filters
-    filters_str = validate_filters(filters_str)  # correct filter errors if necessary
+    food_name = request.args.get('search')  # user input, food to search for
 
     # respond to user interaction
-    if request.method == 'GET' and food_name != '':
+    if request.method == 'GET' and food_name:
+        # get filters from requests
+        filters_str = request.args.get('filters', MFilters.get_default_filter())  # search filters
+        filters_str = validate_filters(filters_str)  # correct filter errors if necessary
+
         # check if interaction was toggling a filter
         for i in range(MFilters.NUM_FILTERS.value):
             if 'filters{}'.format(i) in request.args: 
@@ -34,11 +36,9 @@ def home():
         
         # otherwise, interaction was the search bar (also preserve last filter setting)
         loaded_menu = load_menu_home(food_name, filters_str)
-    else:
-        # Somehow got '' (can happen when user manually types in URL)
-        food_name = "Error retrieving food name"
 
-    # default, user has not interacted (searched) yet
+    # otherwise, user has not interacted (searched) yet. Set initialize filters
+    filters_str = MFilters.get_default_filter()
     return render_template('home.html', menu = loaded_menu, search = food_name, filters = filters_str)
 
 @app.route('/details', methods=['GET'])
