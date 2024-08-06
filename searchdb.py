@@ -94,7 +94,7 @@ def load_menu_details(food_name: str, filters: str):
     cursor = connection.cursor()
 
     # Get the SQL query
-    query = get_filtered_query(filters, food_name, False, cursor)
+    query = get_filtered_query(filters, food_name, True, cursor)
 
     # Execute query
     print(f'load_menu_details searching for {food_name} with filters {filters} and query {query}')
@@ -107,7 +107,7 @@ def load_menu_details(food_name: str, filters: str):
     loaded_details = []
     for row in rows:
         date = row.Date.strftime("%d %B '%y").lstrip('0')
-        loaded_details.append([row.Recipe, date, MEALTIME_CODES[row.Mealtime], LOCATION_CODES[row.Location]])
+        loaded_details.append([date, MEALTIME_CODES[row.Mealtime], LOCATION_CODES[row.Location]])
 
     # Close the connection
     connection.close()
@@ -146,11 +146,18 @@ def validate_filters(filters_str: str, is_details_page: bool):
 def get_connection():
     """ returns a pyodbc connection to the database from environment variables """
     
-    # get database connection information
-    DB_SERVER_NAME = os.getenv('DB_SERVER_NAME')
-    DB_NAME = os.getenv('DB_NAME')
-    DB_USERNAME = os.getenv('DB_USERNAME')
-    DB_PASSWORD = os.getenv('DB_PASSWORD')
+    # # get database connection information
+    # DB_SERVER_NAME = os.getenv('DB_SERVER_NAME')
+    # DB_NAME = os.getenv('DB_NAME')
+    # DB_USERNAME = os.getenv('DB_USERNAME')
+    # DB_PASSWORD = os.getenv('DB_PASSWORD')
+    DB_SERVER_NAME = 'menu-tracker-sqlserver.database.windows.net'
+    DB_NAME = 'menu-tracker-sqldatabase'
+    DB_USERNAME = 'okwbashbye1392'
+    DB_PASSWORD = '0IsR5tAFBT5CkJT$1239'
+    DB_TABLE_NAME = 'testtable1'
+    #todo delete
+
 
     # Connect to database
     connection_string = f"Driver={{ODBC Driver 18 for SQL Server}};"\
@@ -308,7 +315,8 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: 
 def get_table_name(date: datetime):
     """ returns table name in database for a date """
     # table names in format (prefix)_(year)_(month)
-    DB_TABLE_PREFIX = os.getenv('DB_TABLE_PREFIX')
+    # DB_TABLE_PREFIX = os.getenv('DB_TABLE_PREFIX')
+    DB_TABLE_PREFIX = 'menu' # TODO delete
     return f'{DB_TABLE_PREFIX}_{date.year}_{date.month}'
 
 def is_valid_tname(cursor: pyodbc.Cursor, table_name: str):

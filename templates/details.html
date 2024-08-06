@@ -75,9 +75,9 @@
             {% if not menu|length == 0 %}
                 {% for entry in menu %}
                     <p class="result-item-details-con">
-                        <span style="background-color: var(--{{ result_item_colors.get(entry[1], 'lgreen1') }})"> {{ entry[1] }} </span> 
+                        <span style="background-color: var(--{{ result_item_colors.get(entry[0], 'lgreen1') }})"> {{ entry[0] }} </span> 
+                        <span style="background-color: var(--{{ result_item_colors.get(entry[1]) }})"> {{ entry[1] }} </span> 
                         <span style="background-color: var(--{{ result_item_colors.get(entry[2]) }})"> {{ entry[2] }} </span> 
-                        <span style="background-color: var(--{{ result_item_colors.get(entry[3]) }})"> {{ entry[3] }} </span> 
                     </p>
                 {% endfor %}
                 </div>
