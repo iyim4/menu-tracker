@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Overview - Menu Tracker</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='colors.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='base.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='about.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <!-- title -->
+    <div>
+        <h1><a href="{{ url_for('home') }}"> Menu Tracker </a></h1>
+    </div>
+
+    <!-- back button. note: using jump-to-section links will erase about page backwards link. debuug needed -->
+    <div>
+        <button id="back-button" onclick="window.location.href='{{ url_for('about') }}'"> Back to About </button>
+    </div>
+
+    <!-- main text -->
+    <div>
+        <h1 id="about-h1"> Overview </h1>
+
+        <p> This page provides a detailed description of how each component works. (Tap to jump to section)</p>
+        <ul>
+            <li> <a href="#Web-Scraping">Web Scraping </a></li>
+            <li> <a href="#Web-App"> Web App </a> </li>
+            <ul>
+                <li> <a href="#Frontend"> Frontend </a> </li>
+                <li> <a href="#Backend-Framework"> Backend Framework</a> </li>
+                <li> <a href="#Backend"> Backend</a> </li>
+            </ul>
+            <li> <a href="#Cloud-Services"> Cloud Services</a></li>
+        </ul>
+        
+        <div class="text-con">
+            <p> Menu Tracker uses <span class="code">requests</span> to access the dining hall menu webpages, <span
+                    class="code"> BeautifulSoup</span> to extract data from
+                retrieved webpages, and <span class="code">pyodbc</span> to connect to the database to store and
+                retrieve data. Run these commands
+                in the terminal to install them. </p>
+            <p class="code" style="padding: 2%;"> pip install -m beautifulsoup4 <br>pip install -m requests<br>pip
+                install -m pyodbc </p>
+        </div>
+
+        <h2 id="Web-Scraping"> Web Scraping </h2>
+
+        <h3> Get a Dining Hall Menu </h3>
+        <div class="text-con">
+            <p> Use <span class="code">requests</span> to get the HTML file of a dining hall menu webpage using its URL.
+            </p>
+        </div>
+        <h3> Scrape the Data </h3>
+        <div class="text-con">
+            <p> Use <span class="code">BeautifulSoup</span> to parse and extract data from webpage. This requires
+                understanding the structure of the
+                target webpage and identifying under which tag or element that the target data is located. Here, the
+                target
+                data is each food name and the mealtime it is served at. </p>
+        </div>
+        <h3> Store the Data into the Database </h3>
+        <div class="text-con">
+            <p> Use <span class="code">pyodbc</span> to connect and write the data to the database. For every food, it
+                is the food name, date
+                served, mealtimes served, and location served. </p>
+        </div>
+        <h3> Automate the Web Scraper </h3>
+        <div class="text-con">
+            <p> I used Windows Task Scheduler to automatically run the web scraping program from my computer on a daily
+                basis. </p>
+        </div>
+
+        <h2 id="Web-App"> Web App </h2>
+        <h3 id="Frontend"> Frontend </h3>
+        <div class="text-con">
+            <h4> HTML Templates </h4>
+            <p> Use HTML Templates, which are HTML files containing placeholders - part of <span
+                    class="code">Jinja2</span>
+                syntax - for rendering dynamic content, which will be the search results from the backend.
+                Use HTML <span class="code">form</span> and <span class="code">input</span>
+                tags to get user input. </p>
+            <h4> Design with CSS </h4>
+            <p> Use CSS to change the webpage layout and design. The 'mobile-first approach' is a design technique that
+                optimizes the layout for mobile devices then expands (pun intended) to larger devices. </p>
+        </div>
+
+        <h3 id="Backend-Framework"> Backend Framework </h3>
+        <div class="text-con">
+            <p> The backend framework provides a way to connect the backend and the frontend together. It responds to
+                user interaction and renders webpages accordingly. </p>
+            <h4> Define Routes </h4>
+            <p> Use <span class="code">Flask</span> to define routes, which are basically different webpages within a
+                website. When a route is
+                accessed, <span class="code">Flask</span> will run the specified function, making it easy to customize
+                different responses for
+                each page. </p>
+            <h4> Respond to Received Data </h4>
+            <p> In a route's specified function, use <span class="code">Flask</span> to get arguments from the user's
+                webpage access request.
+                This will be search input or filters button interaction. Then, send this information to the backend and
+                get the search result data from it. </p>
+            <h4> Render Webpages </h4>
+            <p> Use <span class="code">Flask</span> to render HTML templates, which replaces <span
+                    class="code">Jinja2</span> placeholders with search result data. </p>
+        </div>
+
+        <h3 id="Backend"> Backend </h3>
+        <div class="text-con">
+            <h4> Get Search Input and Filters from the Backend Framework </h4>
+            <p> Passed in from the backend framework. Decode filters, which are stored as a bit string. Since there are
+                7 filters that will either be on or off, I decided to use a bitstring as a compact way to encode them.
+            </p>
+            <h4> Use Filters to Build a SQL Query </h4>
+            <p> Create a SQL query string based on the constraints provided by the now-decoded filters. Different
+                combinations can result in different query clauses spanning multiple tables. </p>
+            <h4> Pass the Results of the SQL Query to the Frontend </h4>
+            <p> Use <span class="code">pyodbc</span> to execute the query and store the results into a data structure.
+                Then
+                pass this result
+                back to the backend framework. </p>
+
+        </div>
+        <h2 id="Cloud-Services"> Cloud Services </h2>
+        <h3> GitHub </h3>
+        <div class="text-con">
+            <p> Version control. Stores a copy of all web scraping and web app files. </p>
+        </div>
+        <h3> Azure Web App </h3>
+        <div class="text-con">
+            <p> Deploys Menu Tracker, making it available on demand. Handles extra installations needed to deploy
+                <span class="code">Flask</span> programs in production environments. Connected to GitHub so that the web
+                app
+                is automatically
+                updated after each push.
+            </p>
+        </div>
+
+        <h3> Azure SQL Server and Azure SQL Database </h3>
+        <div class="text-con">
+            <p> Stores data on the cloud so that the app can access it on demand. </p>
+        </div>
+        <h3> Azure Virtual Network </h3>
+        <div class="text-con">
+            <p> Connects the app and the database. Allows all requests from Web App to access database.</p>
+        </div>
+        <h3> Note: Connecting to the SQL Database in Python </h3>
+        <div class="text-con">
+            <p> Programs use <span class="code">pyodbc</span> to connect to the database, which needs to know the
+                database
+                server, database
+                name, username, and password to access the database, as well as a table name to access the actual data.
+                In order to not hard code these into my programs - and thus expose it to the internet on GitHub -
+                Azure Web App provides a feature called environment variables which stores custom values. In addition,
+                since my computer is not within Menu Tracker's Virtual Network, I must manually tell the SQL server to
+                allow my computer to access the database (necessary for testing web app code and running the web
+                scraper). </p>
+        </div>
+    </div>
+</body>
+
+</html>

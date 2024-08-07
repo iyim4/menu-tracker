@@ -15,6 +15,7 @@ body {
     background-color: var(--gray1);
     border-radius: var(--brad2);
     overflow-wrap: anywhere;
+    margin: auto;
 }
 @media only screen and (min-width: 600px) {
     body {
@@ -62,6 +63,21 @@ a:hover {
     color: var(--gray4);
 }
 
+/* certain hyperlinks look like buttons, ish */
+.link-button {
+    font-weight: bold;
+    padding: var(--pad1);
+    background-color: var(--gray2);
+    border-radius: var(--brad2);
+    border-width: var(--pad1);
+    cursor: pointer;
+}
+.link-button:hover {
+    filter: brightness(80%);
+    color: var(--gray7);
+}
+
+
 /* buttons */
 button {
     font-size: inherit;
@@ -75,12 +91,6 @@ button {
 }
 button:hover {
     filter: brightness(80%);
-}
-@media only screen and (min-width: 600px) {
-    .button {
-        border-width: var(--pad3);    
-        gap: var(--pad2);
-    }
 }
 
 /* filter buttons */

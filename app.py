@@ -127,6 +127,14 @@ def not_found(e):
     message = f'Error searching for {food_name} in the database'
     return render_template('error.html', message=message)
 
+@app.route('/overview', methods=['GET'])
+def overview():
+    return render_template('overview.html')
+
+@app.route('/about', methods=['GET'])
+def about():
+    return render_template('about.html')
+
 # for running locally
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

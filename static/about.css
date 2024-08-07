@@ -1,0 +1,45 @@
+/* adds extra styles for about and overview pages. needs colors.css and base.css to work */
+h2 {
+    background-color: var(--gray2);
+    padding: var(--pad3);
+    border-radius: var(--brad2);
+}
+h3 {
+    background-color: var(--gray2);
+    padding: var(--pad3);
+    border-radius: var(--brad2);
+    font-style: italic;
+}
+img {
+    width: 100%;
+}
+@media only screen and (min-width: 600px) {
+    img {
+        width: 75%;
+        margin: auto;
+        display: block;
+    }
+}
+
+.code {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    background-color: rgb(255, 232, 232);
+    color: darkred;
+    margin: var(--pad1);
+    padding: var(--pad1);
+    border-radius: var(--brad1);
+}
+
+.text-con {
+    background-color: var(--gray0);
+    padding: 2% 2%;
+    border-radius: var(--brad2);
+}
+#about-h1 {
+    font-family: inherit;
+    font-size: 200%;
+    text-align: left;
+    background-color: transparent;
+    padding: 0 0;
+}

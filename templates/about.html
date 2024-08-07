@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>About - Menu Tracker</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='colors.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='base.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='about.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <!-- title -->
+    <div>
+        <h1><a href="{{ url_for('home') }}"> Menu Tracker </a></h1>
+    </div>
+
+    <!-- back button -->
+    <div>
+        <button id="back-button" onclick="goBack()"> Go Back </button>
+        <script>
+            function goBack() {
+                window.history.back();
+            }
+        </script>
+    </div>
+
+    <!-- Main text -->
+    <div>
+        <h1 id="about-h1"> About </h1>
+
+        <p> Menu Tracker is a web app that displays the upcoming availabilities of foods from UT Austin Dining Halls
+            and offers multiple filters to refine results. </p>
+
+        <h3> Motivation </h3>
+        <div class="text-con">
+            <p> I'm always devestated when I miss the time that my favorite food, brisket, is served at the dining
+                hall.
+                With Menu Tracker, I'll know when brisket is available so that I'll never miss it again! </p>
+            <p> Menu Tracker is my first experience with full stack development. I explored web scraping, website
+                development, database management, and using cloud computing services. I learned SQL and improved my
+                Python, HTML, and CSS skills. (Thank you YouTube tutorials!) </p>
+
+            <p> Links: </p>
+            <p><a href="{{ url_for('overview') }}" class="link-button">Overview</a> Very detailed description of each
+                project component
+            </p>
+            <p><a href="https://github.com/iyim4/menu-tracker" class="link-button"> GitHub Repository</a> Contains
+                source
+                code.
+                currently private.
+            </p>
+        </div>
+
+        <h2> How Does It Work? </h2>
+        <img src="./static/Integration_Diagram.png" alt="Menu Tracker Integration Diagram show interactions between 
+             the Web Scraper, Web App, and User Vists. Brief Details Below." style="border-radius: var(--brad2)">
+        <p> There are two main parts: the app and the database. Web scraping fills the database. The web app is
+            deployed with a cloud computing service. </p>
+
+        <p> See
+            <a href="{{ url_for('overview') }}" class="link-button">Overview</a>
+            for a detailed description of how each component works.
+        </p>
+
+        <h3> Web Scraping </h3>
+        <div class="text-con">
+            <p> Web scraping fills the database with data from the online dining hall menus. It: </p>
+            <ul>
+                <li> Gets the web page of the dining hall menu </li>
+                <li> Scrapes the data from its HTML file </li>
+                <li> Stores the data into the database </li>
+                <li> Is automated to run daily from my computer </li>
+            </ul>
+        </div>
+
+        <h3> Web App </h3>
+        <div class="text-con">
+            <p> The frontend contains the webpages that the users see. The backend framework connects the frontend
+                to
+                the backend. The backend uses data sent by users to send data from the database back to the user.
+            </p>
+            <h4> Frontend </h4>
+            <ul>
+                <li> Backend framework constructs HTML files that display webpage content </li>
+                <li> Uses CSS to style content </li>
+            </ul>
+
+
+            <h4> Backend Framework </h4>
+            <ul>
+                <li> Defines routes </li>
+                <li> Sends received search input and filters to the backend </li>
+                <li> Gets the search result data from the backend </li>
+                <li> Renders webpages using the searh result data </li>
+            </ul>
+
+            <h4> Backend </h4>
+            <ul>
+                <li> Gets search input and selected filters from the backend framework </li>
+                <li> Builds SQL query and gets data from database </li>
+                <li> Passes search result data to the backend framework </li>
+            </ul>
+        </div>
+
+        <h3> Cloud Services </h3>
+        <div class="text-con">
+            <p> Cloud services store Menu Tracker resources so that it is available on demand, independent of my
+                computer. </p>
+            <ul>
+                <li> Azure Web App deploys Menu Tracker as a web app </li>
+                <li> Azure SQL Server and Azure SQL Database stores data </li>
+                <li> Azure Virtual Network allows the web app to access the database </li>
+            </ul>
+        </div>
+
+    </div>
+
+</html>

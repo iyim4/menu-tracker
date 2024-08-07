@@ -28,10 +28,11 @@
         <h2> Uh Oh! {{ message}} </h2>
     </div>
 
-    <!-- additional information -->
-    <div>
-        <p> Menu Tracker searches the availability of food from UT Austin dining halls. 
-            You can view the code <a href="https://github.com/iyim4/menu-tracker"><strong>here</strong></a> (currently private repo) </p>
+    <!-- footer -->
+    <div style="padding-top: 2%;">
+        <p> Menu Tracker is a web app that displays the upcoming availabilities of foods from UT Austin Dining Halls
+            and offers multiple filters to refine results. 
+            <a href="{{ url_for('about')}}" class="link-button"> About</a> </p>
     </div>
 </body>
 
