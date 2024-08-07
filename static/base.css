@@ -64,7 +64,7 @@ a:hover {
 
 /* buttons */
 button {
-    font-size: 80%;
+    font-size: inherit;
     font-family: inherit;
     color: inherit;
     background-color: var(--gray2);
