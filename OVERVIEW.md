@@ -2,7 +2,7 @@
 This document provides a detailed description of how each component works. It covers:
 
 * [Web Scraping](#Web-Scraping)
-* [Web App](#WebApp)
+* [Web App](#Web App)
     * [Frontend](#Frontend)
     * [Backend Framework](#Backend-Framework)
     * [Backend](#Backend)
