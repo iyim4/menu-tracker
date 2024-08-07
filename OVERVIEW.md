@@ -22,7 +22,7 @@ Use `requests` to get the HTML file of a dining hall menu webpage using its URL.
 ### Scrape the Data
 Use `BeautifulSoup` to parse and extract data from webpage. This requires understanding the structure of the target webpage and identifying under which tag or element that the target data is located. Here, the target data is each food name and the mealtime it is served at.
 ### Store the Data into the Database
-Use `pyodbc` to connect and write the data to the database. For every food, it is the food name, date served, mealtimed served, and location served.
+Use `pyodbc` to connect and write the data to the database. For every food, it is the food name, date served, mealtimes served, and location served.
 ### Automate the Web Scraper
 I used Windows Task Scheduler to automatically run the web scraping program from my computer on a daily basis.
 
@@ -47,7 +47,7 @@ Use `Flask` to render HTML templates, which replaces `Jinja2` placeholders with 
 #### Get Search Input and Filters from the Backend Framework
 Passed in from the backend framework. Decode filters, which are stored as a bit string. Since there are 7 filters that will either be on or off, I decided to use a bitstring as a compact way to encode them.
 #### Use Filters to Build a SQL Query
-Create a SQL query string based on the constraints provided by the now-decoded filters. Different cominations can result in different query clauses spanning multiple tables.
+Create a SQL query string based on the constraints provided by the now-decoded filters. Different combinations can result in different query clauses spanning multiple tables.
 #### Pass the Results of the SQL Query to the Frontend
 Use `pyodbc` to execute the query and store the results into a data structure. Then pass this result back to the backend framework. 
 
