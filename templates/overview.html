@@ -17,7 +17,12 @@
 
     <!-- back button. note: using jump-to-section links will erase about page backwards link. debuug needed -->
     <div>
-        <button id="back-button" onclick="window.location.href='{{ url_for('about') }}'"> Back to About </button>
+        <button id="back-button" onclick="goBack()"> Back to About </button>
+        <script>
+            function goBack() {
+                window.location.href = "{{ url_for('about') }}";
+            }
+        </script>
     </div>
 
     <!-- main text -->
@@ -26,14 +31,14 @@
 
         <p> This page provides a detailed description of how each component works. (Tap to jump to section)</p>
         <ul>
-            <li> <a href="#Web-Scraping">Web Scraping </a></li>
-            <li> <a href="#Web-App"> Web App </a> </li>
+            <li> <a href="#Web-Scraping" class="link-button">Web Scraping </a></li>
+            <li> <a href="#Web-App" class="link-button"> Web App </a> </li>
             <ul>
-                <li> <a href="#Frontend"> Frontend </a> </li>
-                <li> <a href="#Backend-Framework"> Backend Framework</a> </li>
-                <li> <a href="#Backend"> Backend</a> </li>
+                <li> <a href="#Frontend" class="link-button"> Frontend </a> </li>
+                <li> <a href="#Backend-Framework" class="link-button"> Backend Framework</a> </li>
+                <li> <a href="#Backend" class="link-button"> Backend</a> </li>
             </ul>
-            <li> <a href="#Cloud-Services"> Cloud Services</a></li>
+            <li> <a href="#Cloud-Services" class="link-button"> Cloud Services</a></li>
         </ul>
         
         <div class="text-con">

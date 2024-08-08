@@ -20,7 +20,16 @@
         <button id="back-button" onclick="goBack()"> Go Back </button>
         <script>
             function goBack() {
-                window.history.back();
+                const referrer = new URL(document.referrer);
+                const referrerPath = referrer.origin + referrer.pathname;
+                const overview = referrer.origin + "{{ url_for('overview') }}"
+                
+                if (referrerPath === overview) {
+                    // if previous is overview, go to home. prevents cycle.
+                    window.location.href = "{{ url_for('home') }}";
+                } else {
+                    window.history.back();
+                }
             }
         </script>
     </div>
@@ -46,9 +55,7 @@
                 project component
             </p>
             <p><a href="https://github.com/iyim4/menu-tracker" class="link-button"> GitHub Repository</a> Contains
-                source
-                code.
-                currently private.
+                source code. currently private.
             </p>
         </div>
 
@@ -92,7 +99,7 @@
                 <li> Defines routes </li>
                 <li> Sends received search input and filters to the backend </li>
                 <li> Gets the search result data from the backend </li>
-                <li> Renders webpages using the searh result data </li>
+                <li> Renders webpages using the search result data </li>
             </ul>
 
             <h4> Backend </h4>
