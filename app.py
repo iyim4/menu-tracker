@@ -14,32 +14,34 @@ def home():
     # Initialize variables and get arguments from requests
     loaded_menu = []  # stores foods and availability information
     food_name = request.args.get('search')  # user input, food to search for
+    filters_str = request.args.get('filters', MFilters.get_default_filter())  # search filters
+    filters_str = validate_filters(filters_str)  # correct filter errors if necessary
 
-    # respond to user interaction
-    if request.method == 'GET' and food_name:
-        # get filters from requests
-        filters_str = request.args.get('filters', MFilters.get_default_filter())  # search filters
-        filters_str = validate_filters(filters_str)  # correct filter errors if necessary
+    if not(request.method == 'GET' and food_name):
+        # initial load of page
+        return render_template('home.html', menu = loaded_menu, search = food_name, filters = filters_str)
+    else:
+        # respond to user interaction
+        # check if interaction was toggling a filter - update filters_str
+        if 'filtersKDIN' in request.args:
+            filters_str = '0001100' if (request.args.get('filtersKDIN') == '0') else '0110011'
+       
+        elif 'filtersJLUN' in request.args:
+            filters_str = '0010011' if (request.args.get('filtersJLUN') == '0') else '0101100'
+        else:
+            # check generic filters
+            for i in range(MFilters.NUM_FILTERS.value):
+                if 'filters{}'.format(i) in request.args: 
+                    # toggle the specific filter option on/off
+                    filters_list = list(filters_str)
+                    filters_list[i] = '0' if filters_list[i] == '1' else '1'
+                    filters_str = ''.join(filters_list)
+                    break
+        # otherwise, if no filters found, user searched for a new food. Previous filters are preserved
 
-        # check if interaction was toggling a filter
-        for i in range(MFilters.NUM_FILTERS.value):
-            if 'filters{}'.format(i) in request.args: 
-                # toggle the specific filter option on/off
-                filters_list = list(filters_str)
-                filters_list[i] = '0' if filters_list[i] == '1' else '1'
-                filters_str = ''.join(filters_list)
-
-                # query database with new filters
-                loaded_menu = load_menu_home(food_name, filters_str)
-
-                return render_template('home.html', menu = loaded_menu, search = food_name, filters = filters_str)
-        
-        # otherwise, interaction was the search bar (also preserve last filter setting)
+        # query database with updated filters and return
         loaded_menu = load_menu_home(food_name, filters_str)
-
-    # otherwise, user has not interacted (searched) yet. Set initialize filters
-    filters_str = MFilters.get_default_filter()
-    return render_template('home.html', menu = loaded_menu, search = food_name, filters = filters_str)
+        return render_template('home.html', menu = loaded_menu, search = food_name, filters = filters_str)
 
 @app.route('/details', methods=['GET'])
 def details():

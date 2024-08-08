@@ -20,6 +20,7 @@
         <form class="input-con" method="GET">
             <input type="text" id="input-search" name="search" required>
             <input type="submit" id="input-button" value="Search">
+            <input type="hidden" name="filters" value="{{ filters }}">
         </form>
     </div>
 
@@ -44,7 +45,8 @@
                         <input type="hidden" name="filters" value="{{ filters }}">
                         {% if filters is defined and filters[i] == '0' %}
                             {# filter out results #}
-                            <button type="submit" name="filters{{ i }}" id="button-off" class="filters-out">
+                            <button type="submit" name="filters{{ i }}" class="filters-out"
+                                style="background-color: var(--l{{ result_item_colors.get(filters_names[i]) }})">
                                 {{ filters_names[i] }} </button>
                         {% else %}
                             <button type="submit" name="filters{{ i }}" class="filters-in" 
@@ -53,6 +55,27 @@
                         {% endif %}
                     </form>
                 {% endfor %}
+
+                <!-- special filters -->
+                <form method="GET">
+                    <input type="hidden" name="search" value="{{ search }}">
+                    <input type="hidden" name="filters" value="{{ filters }}">
+                    {% if filters is defined and filters == '0001100' %}
+                        <button type="submit" name="filtersKDIN" id="filtersKDIN-in" class="filters-in" value="1"> K-Dinner </button>
+                    {% else %}
+                        <button type="submit" name="filtersKDIN" id="filtersKDIN-out"class="filters-out" value="0"> K-Dinner </button>
+                    {% endif %}
+                </form>
+
+                <form method="GET">
+                    <input type="hidden" name="search" value="{{ search }}">
+                    <input type="hidden" name="filters" value="{{ filters }}">
+                    {% if filters is defined and filters == '0010011' %}
+                        <button type="submit" name="filtersJLUN" id="filtersJLUN-in" class="filters-in" value="1"> Junch </button>
+                    {% else %}
+                        <button type="submit" name="filtersJLUN" id="filtersJLUN-out" class="filters-out" value="0"> Junch </button>
+                    {% endif %}
+                </form>
             </div>
 
             <!-- searh results -->
