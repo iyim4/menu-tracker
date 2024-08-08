@@ -23,7 +23,7 @@
                 const referrer = new URL(document.referrer);
                 const referrerPath = referrer.origin + referrer.pathname;
                 const overview = referrer.origin + "{{ url_for('overview') }}"
-                
+
                 if (referrerPath === overview) {
                     // if previous is overview, go to home. prevents cycle.
                     window.location.href = "{{ url_for('home') }}";
@@ -43,19 +43,19 @@
 
         <h3> Motivation </h3>
         <div class="text-con">
-            <p> I'm always devestated when I miss the time that my favorite food, brisket, is served at the dining
-                hall.
-                With Menu Tracker, I'll know when brisket is available so that I'll never miss it again! </p>
+            <p> For the love of brisket! I'm always devastated whenever I miss the time my favorite food is served at
+                the dining hall. With Menu Tracker, I’ll know when brisket is available so that I'll never miss it
+                again! </p>
             <p> Menu Tracker is my first experience with full stack development. I explored web scraping, website
                 development, database management, and using cloud computing services. I learned SQL and improved my
                 Python, HTML, and CSS skills. (Thank you YouTube tutorials!) </p>
 
             <p> Links: </p>
-            <p><a href="{{ url_for('overview') }}" class="link-button">Overview</a> Very detailed description of each
+            <p><a href="{{ url_for('overview') }}" class="link-button">Overview</a> Detailed description of each
                 project component
             </p>
-            <p><a href="https://github.com/iyim4/menu-tracker" class="link-button"> GitHub Repository</a> Contains
-                source code. currently private.
+            <p><a href="https://github.com/iyim4/menu-tracker" class="link-button"> GitHub Repository</a> 
+                Source code. Currently private.
             </p>
         </div>
 

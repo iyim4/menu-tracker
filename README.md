@@ -3,7 +3,7 @@
 Menu Tracker is a web app that displays the upcoming availabilities of foods from UT Austin Dining Halls and offers multiple filters to refine results. [Visit Menu Tracker now!](https://menu-tracker-btbwf7bufydxbuds.canadacentral-01.azurewebsites.net/) 
 
 ### Motivation
-I'm always devestated when I miss the time that my favorite food, brisket, is served at the dining hall. With Menu Tracker, I’ll know when brisket is available so that I'll never miss it again! 
+For the love of brisket! I'm always devastated whenever I miss the time my favorite food is served at the dining hall. With Menu Tracker, I’ll know when brisket is available so that I'll never miss it again! 
 
 Menu Tracker is my first experience with full stack development. I explored web scraping, website development, database management, and using cloud computing services. I learned SQL and improved my Python, HTML, and CSS skills. (Thank you YouTube tutorials!)
 
