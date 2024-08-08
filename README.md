@@ -29,7 +29,7 @@ The frontend contains the webpages that the users see. The backend framework con
 * Defines routes
 * Sends received search input and filters to the backend
 * Gets the search result data from the backend
-* Renders webpages using the searh result data
+* Renders webpages using the search result data
 #### Backend
 * Gets search input and selected filters from the backend framework
 * Builds SQL query and gets data from database
