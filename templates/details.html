@@ -24,14 +24,18 @@
                 }
             </script>
         {% else %}
-            <button id="back-button" onclick="window.location.href='{{ url_for('home') }}'"> Back to Search </button>
+            <button id="back-button" onclick="window.location.href='{{ url_for('home') }}'"> 
+                Back to Search </button>
         {% endif %}
     </div>
 
     <!-- header -->
-    {% set result_item_colors = {'Breakfast': 'orange1', 'Lunch': 'orange2', 'Dinner': 'orange3', 'Kins': 'palette2',
-     'J2': 'palette4', 'JCL': 'palette3', today_str: 'lgreen3', tmr_str: 'lgreen2', 'All Time': 'lgreen1'} %}
+    {# for coloring buttons #}
+    {% set result_item_colors = {'Breakfast': 'orange1', 'Lunch': 'orange2', 'Dinner': 'orange3',
+     'Kins': 'palette2', 'J2': 'palette4', 'JCL': 'palette3', today_str: 'lgreen3', 
+     tmr_str: 'lgreen2', 'All Time': 'lgreen1'} %}
     {% set filters_names = ['All Time', 'Breakfast', 'Lunch', 'Dinner', 'Kins', 'J2', 'JCL'] %}
+    
     <div>
         <h2> {{ search }} Details </h2>
 
@@ -46,7 +50,8 @@
                     {% if filters is defined %}
                         {% if filters[i] == '0' %}
                             {# filter out results #}
-                            <button type="submit" name="filters{{ i }}" class="filters-out">
+                            <button type="submit" name="filters{{ i }}" class="filters-out"
+                                style="background-color: var(--l{{ result_item_colors.get(filters_names[i]) }})">
                                 {{ filters_names[i] }} </button>
                         {% else %}
                             <button type="submit" name="filters{{ i }}" class="filters-in" 
@@ -56,7 +61,8 @@
                     {% else %}
                         {# default case 'All Time' is off #}
                         {% if i == 0 %}
-                            <button type="submit" name="filters{{ i }}" class="filters-out">
+                            <button type="submit" name="filters{{ i }}" class="filters-out"
+                                style="background-color: var(--l{{ result_item_colors.get(filters_names[i]) }})">
                                 {{ filters_names[i] }} </button>
                         {% else %}
                             <button type="submit" name="filters{{ i }}" class="filters-in" 

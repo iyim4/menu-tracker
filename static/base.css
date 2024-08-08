@@ -122,8 +122,21 @@ button:hover {
 }
 .filters-out {
     background-color: var(--gray0);
-    border-color: var(--gray4);
+    border-color: var(--gray0);
     min-height: 2.25em;
+}
+
+#filtersKDIN-in {
+    background-image: linear-gradient(to right, var(--orange3) 33%, var(--palette2) 67%);
+}
+#filtersKDIN-out {
+    background-image: linear-gradient(to right, var(--lorange3) 33%, var(--lpalette2) 67%);
+}
+#filtersJLUN-in {
+    background-image: linear-gradient(to right, var(--orange2) 20%, var(--palette4) 40% 60%, var(--palette3) 80%);
+}
+#filtersJLUN-out {
+    background-image: linear-gradient(to right, var(--lorange2) 20%, var(--lpalette4) 40% 60%, var(--lpalette3) 80%);
 }
 
 /* other buttons */

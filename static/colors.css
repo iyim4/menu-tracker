@@ -20,4 +20,17 @@
     --palette3: #b3c7f7;
     --palette4: #cfebb6;
     --palette5: #b9e192;
+
+    /* lighter colors, by 33% */
+    --llgreen1: #f6faf9;
+    --llgreen2:  #e4f5ee;
+    --llgreen3: #b8f4db;
+    --lorange1: #fefae9;
+    --lorange2: #feeedc;
+    --lorange3:  #fcd8d3;
+    --lpalette1: #fadce8;
+    --lpalette2:  #fde8f0;
+    --lpalette3: #e6edfc;
+    --lpalette4: #eff8e7;
+    --lpalette5: #e8f5db;
 }
