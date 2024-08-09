@@ -135,6 +135,9 @@ def write(cursor: pyodbc.Cursor, table_name: str, html_content: BeautifulSoup,
         # Find all recipes in recipe_table
         recipe_list = menu.find('tr').find_next_sibling().find_all('div', class_='shortmenurecipes')
 
+        # Remove duplicates
+        recipe_list = set(recipe_list)
+
         # Write each recipe
         for recipe in recipe_list:
             instr = f"INSERT INTO {table_name} (Recipe, [Date], Mealtime, [Location]) VALUES (?, ?, ?, ?)"
