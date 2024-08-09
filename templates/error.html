@@ -6,6 +6,13 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='colors.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='base.css') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .center-big {
+            font-size: 200%; 
+            margin: 2%;
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
@@ -14,8 +21,12 @@
         <h1><a href="{{ url_for('home') }}"> Menu Tracker </a></h1>
     </div>
 
+    <div>
+        <h2> Uh Oh! {{ message}} </h2>
+    </div>
+
     <!-- back button -->
-    <div style="font-size: 200%;">
+    <div class="center-big">
         <button id="back-button" onclick="goBack()"> Go Back </button>
         <script> 
             function goBack() {
@@ -24,14 +35,15 @@
         </script>
     </div>
 
-    <div>
-        <h2> Uh Oh! {{ message}} </h2>
+    <!-- back button -->
+    <div class="center-big">
+        <button id="back-button" onclick="window.location.href = '{{ url_for('home') }}'"> Go Home </button>
     </div>
 
     <!-- footer -->
     <div style="padding-top: 2%;">
-        <p> Menu Tracker is a web app that displays the upcoming availabilities of foods from UT Austin Dining Halls
-            and offers multiple filters to refine results. 
+        <p> Menu Tracker is a web app that displays the upcoming availabilities of foods from UT
+            Austin Dining Halls and offers multiple filters to refine results. 
             <a href="{{ url_for('about')}}" class="link-button"> About</a> </p>
     </div>
 </body>

@@ -64,23 +64,28 @@
                     <input type="hidden" name="search" value="{{ search }}">
                     <input type="hidden" name="filters" value="{{ filters }}">
                     {% if filters is defined and filters == '0001100' %}
-                        <button type="submit" name="filtersKDIN" id="filtersKDIN-in" class="filters-in" value="1"> K-Dinner </button>
+                        <button type="submit" name="filtersKDIN" id="filtersKDIN-in" 
+                        class="filters-in" value="1"> K-Dinner </button>
                     {% else %}
-                        <button type="submit" name="filtersKDIN" id="filtersKDIN-out"class="filters-out" value="0"> K-Dinner </button>
+                        <button type="submit" name="filtersKDIN" id="filtersKDIN-out"
+                        class="filters-out" value="0"> K-Dinner </button>
                     {% endif %}
                 </form>
                 <form method="GET">
                     <input type="hidden" name="search" value="{{ search }}">
                     <input type="hidden" name="filters" value="{{ filters }}">
                     {% if filters is defined and filters == '0010011' %}
-                        <button type="submit" name="filtersJLUN" id="filtersJLUN-in" class="filters-in" value="1"> Junch </button>
+                        <button type="submit" name="filtersJLUN" id="filtersJLUN-in" 
+                        class="filters-in" value="1"> Junch </button>
                     {% else %}
-                        <button type="submit" name="filtersJLUN" id="filtersJLUN-out" class="filters-out" value="0"> Junch </button>
+                        <button type="submit" name="filtersJLUN" id="filtersJLUN-out" 
+                        class="filters-out" value="0"> Junch </button>
                     {% endif %}
                 </form>
                 <form method="GET">
+                    <!-- reset just reloads page with search, default filter applied by backend -->
                     <input type="hidden" name="search" value="{{ search }}">
-                    <button type="submit" name="filtersRESET" class="filters-out" style="background-color: var(--gray1);"> Reset </button>
+                    <button type="submit" class="filters-out" style="background-color: var(--gray1);"> Reset </button>
                 </form>
             </div>
 
@@ -92,7 +97,8 @@
                             {% if loop.first or entry[0] != menu[loop.index0 - 1][0] %}
                                 {% if not loop.first %}</div>{% endif %}
                                 <div class="result-item">
-                                    <p><span style="font-weight: bold;"><a href="{{ url_for('details', search=entry[0]) }}"> {{ entry[0] }} </a></span></p>
+                                    <p><span style="font-weight: bold;"><a href="{{ url_for('details',
+                                         search=entry[0]) }}"> {{ entry[0] }} </a></span></p>
                             {% endif %}
                             <p class="result-item-details-con">
                                 <span style="background-color: var(--{{ result_item_colors.get(entry[1], 'lgreen1') }})"> {{ entry[1] }} </span> 
@@ -110,8 +116,8 @@
 
     <!-- footer -->
     <div style="padding-top: 2%;">
-        <p> Menu Tracker is a web app that displays the upcoming availabilities of foods from UT Austin Dining Halls
-            and offers multiple filters to refine results. 
+        <p> Menu Tracker is a web app that displays the upcoming availabilities of foods from UT
+            Austin Dining Halls and offers multiple filters to refine results. 
             <a href="{{ url_for('about')}}" class="link-button"> About</a> </p>
     </div>
 </body>
