@@ -29,10 +29,13 @@
         {% if search is none %}
             <h2> Enter the name of a food in the search bar </h2>
         {% else %}
-            <!-- colors for labels -->
-            {% set result_item_colors = {'Breakfast': 'orange1', 'Lunch': 'orange2', 'Dinner': 'orange3', 
-            'Kins': 'palette2', 'J2': 'palette4', 'JCL': 'palette3', 'Today': 'lgreen3', 'Tomorrow': 'lgreen2'} %}
-            {% set filters_names = ['All Time', 'Breakfast', 'Lunch', 'Dinner', 'Kins', 'J2', 'JCL'] %}
+            {# colors for labels #}
+            {% set result_item_colors = {'Breakfast': 'orange1', 'Lunch': 'orange2', 
+            'Dinner': 'orange3', 'Kins': 'palette2', 'J2': 'palette4', 
+            'JCL': 'palette3', 'Today': 'lgreen3', 'Tomorrow': 'lgreen2'} %}
+
+            {% set filters_names = ['All Time', 'Breakfast', 'Lunch', 'Dinner',
+             'Kins', 'J2', 'JCL'] %}
 
             <h2> Results for {{ search }} </h2>
 
@@ -66,7 +69,6 @@
                         <button type="submit" name="filtersKDIN" id="filtersKDIN-out"class="filters-out" value="0"> K-Dinner </button>
                     {% endif %}
                 </form>
-
                 <form method="GET">
                     <input type="hidden" name="search" value="{{ search }}">
                     <input type="hidden" name="filters" value="{{ filters }}">
@@ -75,6 +77,10 @@
                     {% else %}
                         <button type="submit" name="filtersJLUN" id="filtersJLUN-out" class="filters-out" value="0"> Junch </button>
                     {% endif %}
+                </form>
+                <form method="GET">
+                    <input type="hidden" name="search" value="{{ search }}">
+                    <button type="submit" name="filtersRESET" class="filters-out" style="background-color: var(--gray1);"> Reset </button>
                 </form>
             </div>
 
