@@ -15,7 +15,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from searchdb import LOCATION_CODES, get_table_name, is_valid_tname
 
 # the number of days ahead from to scrape from
-CHECK_DAYS_AHEAD = 17
+CHECK_DAYS_AHEAD = 14
 
 # Set up logging
 logger = get_logger()
@@ -44,7 +44,7 @@ for i in range(0, CHECK_DAYS_AHEAD + 1):
     if not is_valid_tname(cursor, table_name):
         cursor.execute(f'''
             CREATE TABLE {table_name} (
-                Recipe varchar(70),
+                Recipe varchar(65),
                 Date datetime,
                 Mealtime int,
                 Location int
