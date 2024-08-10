@@ -2,7 +2,7 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-name: Build and deploy Python app to Azure Web App - menu-tracker
+name: Build and deploy Python app to Azure Web App - utmenutracker
 
 on:
   push:
@@ -65,14 +65,14 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_4B10A76F03E249DB8537A1D3CC37A480 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_1900E8A112BD4ED183F23C111CA33655 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A6C4E774A72042AF9A4F32FF112F521D }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_283CDA766F11441C816245E76BC7192C }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2CBB0DAC413644D889B571B6E33518F6 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_50575B17E0BF429EB46DF26DEEC0D529 }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: 'menu-tracker'
+          app-name: 'utmenutracker'
           slot-name: 'Production'
           
