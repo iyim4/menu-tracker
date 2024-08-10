@@ -308,8 +308,7 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: 
 def get_table_name(date: datetime):
     """ returns table name in database for a date """
     # table names in format (prefix)_(year)_(month)
-    # DB_TABLE_PREFIX = os.getenv('DB_TABLE_PREFIX')
-    DB_TABLE_PREFIX = 'menu' # TODO delete
+    DB_TABLE_PREFIX = os.getenv('DB_TABLE_PREFIX')
     return f'{DB_TABLE_PREFIX}_{date.year}_{date.month}'
 
 def is_valid_tname(cursor: pyodbc.Cursor, table_name: str):
