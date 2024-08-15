@@ -33,7 +33,7 @@ class MFilters(Enum):
     TIME_SHORT = 0
     TIME_FUTURE = 1
     TIME_ALL = 2
-    TIME_SHORT_LIMIT = 10 # the number of days TIME_SHORT displays
+    TIME_SHORT_LIMIT = 3 # the number of days TIME_SHORT displays
 
     # default filter string. time is off and everything else is on
     def get_default_filter():
