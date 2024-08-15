@@ -8,7 +8,7 @@ This document provides a detailed description of how each component works. It co
     * [Backend](#Backend)
 * [Cloud Services](#Cloud-Services)
 
-Menu Tracker uses `requests` to access the dining hall menu webpages, `BeautifulSoup` to extract data from retrieved webpages, and `pyodbc` to connect to the database to store and retrieve data. Run these commands in the terminal to install them.
+UT Menu Tracker uses `requests` to access the dining hall menu webpages, `BeautifulSoup` to extract data from retrieved webpages, and `pyodbc` to connect to the database to store and retrieve data. Run these commands in the terminal to install them.
 ``` 
 pip install -m beautifulsoup4
 pip install -m requests
