@@ -12,19 +12,36 @@ from db_connection_info import CONNECTION_INFO # file ON MY COMPUTER storing log
 
 # import methods from searchdb: Add the parent directory to the system path to access it
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from searchdb import LOCATION_CODES, get_table_name, is_valid_tname
+from searchdb import LOCATION_CODES
 
+# the date to start scraping from
+START_DATE = datetime.today()
 # the number of days ahead from to scrape from
-CHECK_DAYS_AHEAD = 14
+CHECK_DAYS_AHEAD = 11
 
-# Set up logging
+# define helper methods
+def get_table_name(date: datetime):
+    """ returns table name in database for a date """
+    return f'{CONNECTION_INFO.DB_TABLE_PREFIX}_{date.year}_{date.month}'
+
+def is_valid_tname(cursor: pyodbc.Cursor, table_name: str):
+    """ Returns true if table_name is a valid table name (present in cursor's database), false otherwise """
+    return cursor.tables(table=table_name, tableType='TABLE').fetchone() is not None
+
+LOCATION_CODES_URL = ['ERROR', '03', '12', '12(a)']
+LOCATION_STRINGS_URL = ['ERROR', 'Kins+Dining', 'J2+Dining', 'Jester+City+Limits+(JCL)']
+def get_url(location_num: int, date: datetime):
+    """ returns url for dining hall at location and date """
+    return (
+        'https://hf-foodpro.austin.utexas.edu/foodpro/shortmenu.aspx?sName=University+Housing+and+Dining'
+        f'&locationNum={LOCATION_CODES_URL[location_num]}&locationName={LOCATION_STRINGS_URL[location_num]}'
+        '&naFlag=1&WeeksMenus=This+Week%27s+Menus&myaction=read'
+        f'&dtdate={date.month}%2f{date.day}%2f{date.year}'
+    )
+
+# Log range
 logger = get_logger()
-
-# Get the date to begin searching from
-date = datetime.today()
-date = datetime(date.year, date.month, date.day)
-start_date = date
-logger.debug(f'Search starting from {start_date.date()} to {(date + timedelta(days=CHECK_DAYS_AHEAD)).date()}')
+logger.debug(f'Search starting from {START_DATE.date()} to {(START_DATE + timedelta(days=CHECK_DAYS_AHEAD)).date()}')
 
 # Connect to database
 connection_string = f"Driver={{ODBC Driver 18 for SQL Server}};Server=tcp:{CONNECTION_INFO.DB_SERVER_NAME},1433;Database={CONNECTION_INFO.DB_NAME};"\
@@ -33,6 +50,7 @@ connection = pyodbc.connect(connection_string)
 cursor = connection.cursor()
 
 # get first table
+date = datetime(START_DATE.year, START_DATE.month, START_DATE.day)
 table_name = get_table_name(date)
 
 # store tables written to in a list
@@ -59,10 +77,11 @@ for i in range(0, CHECK_DAYS_AHEAD + 1):
     # scrape from each dining hall location on this date
     for loc_num in range(1, 4):
         logger.debug(f'Scraping from {LOCATION_CODES[loc_num]}, {date.date()}')
-        scraper_main(loc_num, date, table_name, cursor)
+        url = get_url(loc_num, date)
+        scraper_main(url, loc_num, date, table_name, cursor)
 
     # get next date and table_name
-    date = date + timedelta(days=1)
+    date += timedelta(days=1)
     table_name = get_table_name(date)
 
 # commit writes and close
@@ -70,5 +89,5 @@ connection.commit()
 connection.close()
 
 # log success
-logger.info(f'Successfully scraped from {start_date.date()} to '\
+logger.info(f'Successfully scraped from {START_DATE.date()} to '\
             f'{(date - timedelta(days=1)).date()} and stored into tables {", ".join(tables)}')

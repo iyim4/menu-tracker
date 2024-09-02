@@ -17,16 +17,17 @@ from searchdb import MEALTIME_CODES, LOCATION_CODES
 def get_logger(): 
     """ returns logger that this file writes to """
     LOG_NAME = 'scraper.log'
-    LOG_LEVEL = logging.INFO
+    LOG_LEVEL = logging.DEBUG
     current_dir = os.path.dirname(__file__)
     log_path = os.path.join(os.path.dirname(__file__), LOG_NAME)
     logging.basicConfig(level=LOG_LEVEL, filename=log_path, filemode='w',
                         format="%(asctime)s [%(levelname)s] %(filename)s: %(message)s")
     return logging.getLogger(LOG_NAME)
 
-def scraper_main(location_num: int, date: datetime, table_name: str, cursor: pyodbc.Cursor):
+def scraper_main(source_url: str, location_num: int, date: datetime, table_name: str, cursor: pyodbc.Cursor):
     """Scrapes and stores recipes from a UT austin menu URL into database
 
+    :source_url: for the location. should match location_num and date
     :location_num: of location to scrape from, must be 1, 2, or 3
     :date: to scrape from, recommended to be between 7 days ago and 14 days ahead
     :table_name: name of table in database
@@ -57,7 +58,7 @@ def scraper_main(location_num: int, date: datetime, table_name: str, cursor: pyo
         logger.debug(f'Begin scraping from {LOCATION_CODES[location_num]}, {date.date()}.')
     
     # scrape website
-    html_content = get_html_content(location_num, date)
+    html_content = get_html_content(source_url, location_num, date)
 
     # write only if there is data available
     if html_content.find(text='No Data Available'):
@@ -67,7 +68,7 @@ def scraper_main(location_num: int, date: datetime, table_name: str, cursor: pyo
 
     # write to database
     write(cursor, table_name, html_content, location_num, date)
-    logger.debug('no writes occurred')
+    # logger.debug('no writes occurred')
 
     # print success message
     logger.info(f'Successfully scraped and cursor-wrote from {LOCATION_CODES[location_num]}, {date.date()}')
@@ -86,25 +87,13 @@ def is_valid_tname(cursor: pyodbc.Cursor, table_name: str):
     """ Returns true if table_name is a valid table name (present in database), false otherwise """
     return cursor.tables(table=table_name, tableType='TABLE').fetchone() is not None
 
-def get_html_content(location_num: int, date: datetime):
+def get_html_content(source_url: str, location_num: int, date: datetime):
     """Get HTML content
 
+    :source_url: for the location. should match location_num and date
     :location_num: to scrape from, should be 1, 2, or 3
     :date: to scrape from, recommended to be between 7 days ago or 14 days ahead
     """
-
-    # for converting database codes to url codes
-    LOCATION_CODES_URL = ['ERROR', 3, 12, 1]
-    LOCATION_STRINGS_URL = ['ERROR', 'Kins+Dining', 'J2+Dining', 'Jester+City+Limits+(JCL)']
-    
-    # build url
-    source_url = (
-        'https://hf-foodpro.austin.utexas.edu/foodpro/shortmenu.aspx?sName=University+Housing+and+Dining'
-        f'&locationNum={LOCATION_CODES_URL[location_num]}&locationName={LOCATION_STRINGS_URL[location_num]}'
-        '&naFlag=1&WeeksMenus=This+Week%27s+Menus&myaction=read'
-        f'&dtdate={date.month}%2f{date.day}%2f{date.year}'
-    )
-
     # Get HTML from website
     html_content = get(source_url).text
 
