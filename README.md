@@ -41,3 +41,6 @@ Cloud services store Menu Tracker resources so that it is available on demand, i
 * Azure Web App deploys Menu Tracker as a web app
 * Azure SQL Server and Azure SQL Database stores data 
 * Azure Virtual Network allows the web app to access the database
+
+### Note
+Database contains data from 7/24/2024 - Present, except for 12/10/2024-12/16/2024.
