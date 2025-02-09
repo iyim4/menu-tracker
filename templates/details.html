@@ -76,11 +76,46 @@
         </div>
     </div>
 
-    <!-- details search results -->
+    <!-- details search results: Future -->
+    <div>
+        <!-- Today and Upcoming -->
+        <div class="details-result-con">
+            <p>Today & Upcoming</p>
+
+            {% if not future_menu|length == 0 %}
+                {% for entry in future_menu %}
+                    <p class="result-item-details-con">
+                        <span style="background-color: var(--{{ result_item_colors.get(entry[0], 'lgreen1') }})"> {{ entry[0] }} </span> 
+                        <span style="background-color: var(--{{ result_item_colors.get(entry[1]) }})"> {{ entry[1] }} </span> 
+                        <span style="background-color: var(--{{ result_item_colors.get(entry[2]) }})"> {{ entry[2] }} </span> 
+                    </p>
+                {% endfor %}
+                </div>
+            {% else %}
+                <p style="font-weight: bold;"> No results found </p>
+            {% endif %}
+    </div>
+
+    <!-- Our Predictions -->
     <div>
         <div class="details-result-con">
-            {% if not menu|length == 0 %}
-                {% for entry in menu %}
+            <p> Predicted </p>
+            <p class="result-item-details-con">
+                <span style="background-color: var(--{{ result_item_colors.get(prediction_entry[0], 'lgreen1') }})"> {{ prediction_entry[0] }} </span> 
+                <span style="background-color: var(--{{ result_item_colors.get(prediction_entry[1]) }})"> {{ prediction_entry[1] }} </span> 
+                <span style="background-color: var(--{{ result_item_colors.get(prediction_entry[2]) }})"> {{ prediction_entry[2] }} </span> 
+            </p>
+        </div>
+    </div>
+
+    <!-- details search results: Past -->
+    <div>
+        <div class="details-result-con">
+            <p> Past </p>
+            
+            {% if not past_menu|length == 0 %}
+                {% for entry in past_menu %}
+                
                     <p class="result-item-details-con">
                         <span style="background-color: var(--{{ result_item_colors.get(entry[0], 'lgreen1') }})"> {{ entry[0] }} </span> 
                         <span style="background-color: var(--{{ result_item_colors.get(entry[1]) }})"> {{ entry[1] }} </span> 

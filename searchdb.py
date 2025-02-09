@@ -33,7 +33,7 @@ class MFilters(Enum):
     # Time filter codes
     TIME_SHORT = 0
     TIME_FUTURE = 1
-    TIME_ALL = 2
+    TIME_PAST = 2
     TIME_SHORT_LIMIT = 3 # the number of days TIME_SHORT displays
 
     # default filter string. time is off and everything else is on
@@ -275,7 +275,7 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool,
             return f'{table1} {order_clause}'
     
     else:
-        # TIME ALL case: searches from all tables
+        # TIME PAST case: searches everything before today, exclusive
         today = get_today()
         start_date = datetime(2024, 7, 1) # database won't contain any data before july 2024
         end_date = datetime(today.year, today.month, 1)
@@ -290,21 +290,17 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool,
             month = temp_date.month + 1 if temp_date.month != 12 else 1
             year = temp_date.year if month != 1 else temp_date.year + 1
             temp_date = datetime(year, month, 1)
+        
+        # combine query elements to form partial query
+        where_clause_partial = ' AND '.join(where_clause)
+        select_clauses = [f'SELECT * from {table} WHERE {where_clause_partial}' for table in tables]
 
-        # add this month's table
-        tables.append(get_table_name(temp_date))
-
-        # add next month's table if available
-        month = end_date.month + 1 if end_date.month != 12 else 1
-        year = end_date.year if month != 1 else end_date.year + 1
-        next_month = datetime(year, month, 1)
-        next_tname = get_table_name(next_month)
-        if is_valid_tname(cursor, next_tname):
-            tables.append(next_tname)
+        # add this month's table and date filter
+        where_clause.append(f"([Date] >= '{today.strftime("%m/%d/%Y")}')")
+        where_clause_final = ' AND '.join(where_clause)
+        select_clauses.append(f'SELECT * from {get_table_name(temp_date)} WHERE {where_clause_final}')
 
         # combine query elements to form full query and return
-        where_clause = ' AND '.join(where_clause)
-        select_clauses = [f'SELECT * from {table} WHERE {where_clause}' for table in tables]
         return ' UNION '.join(select_clauses) + order_clause
 
 def get_table_name(date: datetime):
