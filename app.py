@@ -4,6 +4,7 @@
 from datetime import datetime, timedelta
 from flask import Flask, request, render_template
 from searchdb import load_menu_details, load_menu_home, MFilters
+from predict_dates import predict_future_date
 
 app = Flask(__name__)
 
@@ -71,23 +72,40 @@ def details():
                 filters_list[0] = '1' if filters_list[0] == '0' else '2'
                 recoded_filter = ''.join(filters_list)
                 
-                # query database with new (recoded) filters
-                loaded_details = load_menu_details(food_name, recoded_filter)
+                # query database with filters for the future and past
+                filters_list[0] = str(MFilters.TIME_FUTURE.value)
+                future_menu_filters = ''.join(filters_list)
+                future_menu = load_menu_details(food_name, future_menu_filters)
 
-                return render_template('details.html', menu = loaded_details, search = food_name, 
-                                       filters = filters_str, today_str = today_str, tmr_str = tmr_str)
+                filters_list[0] = str(MFilters.TIME_PAST.value)
+                past_menu_filters = ''.join(filters_list)
+                past_menu = load_menu_details(food_name, past_menu_filters)
+
+                prediction_entry = predict_future_date (food_name)
+
+                return render_template('details.html', future_menu = future_menu, past_menu = past_menu, 
+                                       search = food_name, filters = filters_str, today_str = today_str, 
+                                       tmr_str = tmr_str, prediction_entry = prediction_entry)
         
         # else, no button was clicked. It was the initial load of details page. 
-        # recode filter for details page toggles: future/all time visibility
-        recoded_filter = '1' + filters_str[1:]
-        loaded_details = load_menu_details(food_name, recoded_filter)
+
+        # query database with filters for the future and past
+        future_menu_filters = str(MFilters.TIME_FUTURE.value) + filters_str[1:]
+        future_menu = load_menu_details(food_name, future_menu_filters)
+
+        past_menu_filters = str(MFilters.TIME_PAST.value) + filters_str[1:]
+        past_menu = load_menu_details(food_name, past_menu_filters)
+
     else:
         # Somehow got '' (can happen when user manually types in URL)
         loaded_details = []
         food_name = 'Error retrieving food name. No'
 
-    return render_template('details.html', search = food_name, menu = loaded_details, 
-                           today_str = today_str, tmr_str = tmr_str)
+    prediction_entry = predict_future_date (food_name)
+
+    return render_template('details.html', search = food_name, future_menu = future_menu, 
+                           past_menu = past_menu, today_str = today_str, tmr_str = tmr_str, 
+                           prediction_entry = prediction_entry)
 
 def validate_filters(filters_str: str):
     """ checks that filters_str is valid and returns a corrected string otherwise """
