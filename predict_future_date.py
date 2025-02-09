@@ -96,65 +96,69 @@ def make_predictions (cursor, csv_file_name):
     food_kins_db = food_appearance_db[food_appearance_db["Kins"] == 1].drop(columns=['J2', 'JCL'])
     food_kins_db = food_kins_db.drop_duplicates(subset=['Date(Datetime)', 'Food'], keep='first')
     food_kins_db["Gap"] = food_kins_db.groupby('Food')['Date(Datetime)'].diff().dt.days
-    # #J2
-    # food_j2_db = food_appearance_db[food_appearance_db["J2"] == 1].drop(columns=['Kins', 'JCL'])
-    # food_j2_db = food_j2_db.drop_duplicates(subset=['Date(Datetime)', 'Food'], keep='first')
-    # food_j2_db["Gap"] = food_j2_db.groupby('Food')['Date(Datetime)'].diff().dt.days
-    # #JCL
-    # food_jcl_db = food_appearance_db[food_appearance_db["JCL"] == 1].drop(columns=['J2', 'Kins'])
-    # food_jcl_db = food_jcl_db.drop_duplicates(subset=['Date(Datetime)', 'Food'], keep='first')
-    # food_jcl_db["Gap"] = food_jcl_db.groupby('Food')['Date(Datetime)'].diff().dt.days
+    #J2
+    food_j2_db = food_appearance_db[food_appearance_db["J2"] == 1].drop(columns=['Kins', 'JCL'])
+    food_j2_db = food_j2_db.drop_duplicates(subset=['Date(Datetime)', 'Food'], keep='first')
+    food_j2_db["Gap"] = food_j2_db.groupby('Food')['Date(Datetime)'].diff().dt.days
+    #JCL
+    food_jcl_db = food_appearance_db[food_appearance_db["JCL"] == 1].drop(columns=['J2', 'Kins'])
+    food_jcl_db = food_jcl_db.drop_duplicates(subset=['Date(Datetime)', 'Food'], keep='first')
+    food_jcl_db["Gap"] = food_jcl_db.groupby('Food')['Date(Datetime)'].diff().dt.days
 
     # Train the models and get predictions for each dining hall
     kins_model = make_food_model(food_kins_db)
     kins_predicted_future_dates = predict_food_days(kins_model, food_kins_db).transpose()
 
-    # j2_model = make_food_model(food_j2_db)
-    # j2_predicted_future_dates = predict_food_days(j2_model, food_j2_db).transpose()
+    j2_model = make_food_model(food_j2_db)
+    j2_predicted_future_dates = predict_food_days(j2_model, food_j2_db).transpose()
 
-    # jcl_model = make_food_model(food_jcl_db)
-    # jcl_predicted_future_dates = predict_food_days(jcl_model, food_jcl_db).transpose()
+    jcl_model = make_food_model(food_jcl_db)
+    jcl_predicted_future_dates = predict_food_days(jcl_model, food_jcl_db).transpose()
 
     # FORMAT: Turn 'food names' from index into a new column
     kins_predicted_food_dates_reset = kins_predicted_future_dates.reset_index()
-    # j2_predicted_food_dates_reset = j2_predicted_future_dates.reset_index()
-    # jcl_predicted_food_dates_reset = jcl_predicted_future_dates.reset_index()
+    j2_predicted_food_dates_reset = j2_predicted_future_dates.reset_index()
+    jcl_predicted_food_dates_reset = jcl_predicted_future_dates.reset_index()
 
     # FORMAT: Rename the food names column from 'index' to 'Food Name'
     # Result is a table in this format for each dining hall: "Food Name", 0, 1 , 2
     kins_predicted_dates = kins_predicted_food_dates_reset.rename(columns={'index': 'Food Name'})
-    # j2_predicted_dates = j2_predicted_food_dates_reset.rename(columns={'index': 'Food Name'})
-    # jcl_predicted_dates = jcl_predicted_food_dates_reset.rename(columns={'index': 'Food Name'})
+    j2_predicted_dates = j2_predicted_food_dates_reset.rename(columns={'index': 'Food Name'})
+    jcl_predicted_dates = jcl_predicted_food_dates_reset.rename(columns={'index': 'Food Name'})
 
-    # Save these predictions into the database
-
+    # Save these predictions into the database:
+    ### KINS ###
     # Convert all columns with date values (except 'Food Name') to datetime objects
     for col in kins_predicted_dates.columns[1:]:  # Skip 'Food Name'
         kins_predicted_dates[col] = kins_predicted_dates[col].dt.date  # Convert to date object
-
-    # Resetting the index and assigning it as a new column
-    kins_predicted_food_dates_reset = kins_predicted_future_dates.reset_index()
-
-    # Rename the food string column from 'index' to 'Food Name'
-    kins_predicted_dates = kins_predicted_food_dates_reset.rename(columns={'index': 'Food Name'})
-
-    # Convert all columns with date values (except 'Food Name') to date objects
-    for col in kins_predicted_dates.columns[1:]:  # Skip 'Food Name'
+    kins_predicted_food_dates_reset = kins_predicted_future_dates.reset_index() # Resetting the index and assigning it as a new column
+    kins_predicted_dates = kins_predicted_food_dates_reset.rename(columns={'index': 'Food Name'}) # Rename the food string column from 'index' to 'Food Name'
+    for col in kins_predicted_dates.columns[1:]:  # Skip 'Food Name'     # Convert all columns with date values (except 'Food Name') to date objects
         kins_predicted_dates[col] = kins_predicted_dates[col].dt.date
+    kins_predicted_dates_array = kins_predicted_dates.to_numpy()     # Convert the DataFrame to a NumPy array
+    save_predictions_to_db (kins_predicted_dates_array, cursor, LocationCodesNum.KINS.value)     # Save predictions
 
-    # Convert the DataFrame to a NumPy array
-    kins_predicted_dates_array = kins_predicted_dates.to_numpy()
+    ### J2 ###
+    # Convert all columns with date values (except 'Food Name') to datetime objects
+    for col in j2_predicted_dates.columns[1:]:  # Skip 'Food Name'
+        j2_predicted_dates[col] = j2_predicted_dates[col].dt.date  # Convert to date object
+    j2_predicted_food_dates_reset = j2_predicted_future_dates.reset_index() # Resetting the index and assigning it as a new column
+    j2_predicted_dates = j2_predicted_food_dates_reset.rename(columns={'index': 'Food Name'}) # Rename the food string column from 'index' to 'Food Name'
+    for col in j2_predicted_dates.columns[1:]:  # Skip 'Food Name'     # Convert all columns with date values (except 'Food Name') to date objects
+        j2_predicted_dates[col] = j2_predicted_dates[col].dt.date
+    j2_predicted_dates_array = j2_predicted_dates.to_numpy()     # Convert the DataFrame to a NumPy array
+    save_predictions_to_db (j2_predicted_dates_array, cursor, LocationCodesNum.J2.value)     # Save predictions
 
-    kins_predicted_dates_array = kins_predicted_dates_array[:10]
-    save_predictions_to_db (kins_predicted_dates_array, cursor, LocationCodesNum.KINS.value)
-    # save_predictions_to_db (j2_predicted_dates, cursor, LocationCodesNum.J2.value)
-    # save_predictions_to_db (jcl_predicted_dates, cursor, LocationCodesNum.JCL.value)
+    ### JCL ###
+    # Convert all columns with date values (except 'Food Name') to datetime objects
+    for col in jcl_predicted_dates.columns[1:]:  # Skip 'Food Name'
+        jcl_predicted_dates[col] = jcl_predicted_dates[col].dt.date  # Convert to date object
+    jcl_predicted_food_dates_reset = jcl_predicted_future_dates.reset_index() # Resetting the index and assigning it as a new column
+    jcl_predicted_dates = jcl_predicted_food_dates_reset.rename(columns={'index': 'Food Name'}) # Rename the food string column from 'index' to 'Food Name'
+    for col in jcl_predicted_dates.columns[1:]:  # Skip 'Food Name'     # Convert all columns with date values (except 'Food Name') to date objects
+        jcl_predicted_dates[col] = jcl_predicted_dates[col].dt.date
+    jcl_predicted_dates_array = jcl_predicted_dates.to_numpy()     # Convert the DataFrame to a NumPy array
+    save_predictions_to_db (jcl_predicted_dates_array, cursor, LocationCodesNum.JCL.value)     # Save predictions
 
-    # for col in j2_predicted_dates.columns[1:]:  # Skip 'Food Name'
-    #     j2_predicted_dates[col] = kins_predicted_dates[col].dt.date  # Convert to date object
-    
-    # for col in jcl_predicted_dates.columns[1:]:  # Skip 'Food Name'
-    #     jcl_predicted_dates[col] = kins_predicted_dates[col].dt.date  # Convert to date object
-    
     # Done
     print ("Done making and writing predictions") # not yet committed, though!

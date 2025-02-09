@@ -91,7 +91,7 @@ connection.commit()
 logger.debug(f"Done writing data")
 
 # Convert Database into CSV for training models
-# download_database_csv(cursor)
+download_database_csv(cursor)
 
 # Re-train models with new data and save results into database
 make_predictions(cursor, ENTIRE_DATABASE_CSV_FILENAME)
