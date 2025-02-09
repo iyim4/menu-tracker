@@ -8,9 +8,19 @@ from enum import Enum
 import pyodbc
 import pytz
 import os
+import pandas as pd
 
 # mapping from database codes to strings
+NUM_PREDICTIONS = 3 # Number of dates to predict for each food 
 MEALTIME_CODES = ['ERROR', 'Breakfast', 'Lunch', 'Dinner']
+ENTIRE_DATABASE_CSV_FILENAME = 'entire_database.csv'
+class LocationCodesNum(Enum):
+    ERR = 0
+    KINS = 1
+    J2 = 2
+    JCL = 3
+
+    # def get_name (code): return location codes str
 LOCATION_CODES = ['ERROR', 'Kins', 'J2', 'JCL']
 
 class MFilters(Enum):
@@ -326,3 +336,110 @@ def get_today() -> datetime:
 
     # Print the new datetime object
     return cst_today
+
+def download_database_csv(cursor: pyodbc.Cursor):
+    # get dates to search from all tables
+    today = get_today()
+    start_date = datetime(2024, 7, 1) # database won't contain any data before july 2024
+    end_date = datetime(today.year, today.month, 1)
+    temp_date = start_date
+
+    # build list of tables to search
+    tables = []
+
+    # add past tables
+    while not(temp_date.year == end_date.year and temp_date.month == end_date.month):
+        tables.append(get_table_name(temp_date))
+        month = temp_date.month + 1 if temp_date.month != 12 else 1
+        year = temp_date.year if month != 1 else temp_date.year + 1
+        temp_date = datetime(year, month, 1)
+
+    # add this month's table
+    tables.append(get_table_name(temp_date))
+
+    # add next month's table if available
+    month = end_date.month + 1 if end_date.month != 12 else 1
+    year = end_date.year if month != 1 else end_date.year + 1
+    next_month = datetime(year, month, 1)
+    next_tname = get_table_name(next_month)
+    if is_valid_tname(cursor, next_tname):
+        tables.append(next_tname)
+
+    # combine query elements to full query
+    order_clause = ' ORDER BY Recipe, [Date], Mealtime'
+    select_clauses = [f'SELECT * from {table}' for table in tables]
+    query = ' UNION '.join(select_clauses) + order_clause
+
+    # Execute query
+    print (f"Download_database_csv: Executing query {query}.")
+    # smaller query for safety - delete this line later
+    query = "select * from [dbo].[menu_2025_2] UNION select * from [dbo].[menu_2025_1]"
+    cursor.execute(query)
+
+    # Fetch results of query
+    rows = cursor.fetchall()
+
+    # Extract data and store into a list in the details page format
+    entire_db = []
+    for row in rows:
+        # add One Hot Encoding for Mealtimes and Locations. format:
+        # food name, date, isBreakfast?, isLunch?, isDinner?, isKins?, isJ2?, isJCL?
+        entire_db.append([row.Recipe, row.Date, int(row.Mealtime == 1), 
+                          int(row.Mealtime == 2), int(row.Mealtime == 3), 
+                          int(row.Location == 1), int(row.Location == 2), 
+                          int(row.Location == 3)])
+
+    # Converting entire db to a dataframe & then to .CSV
+    entire_db_df = pd.DataFrame(entire_db)
+    entire_db_df.to_csv(ENTIRE_DATABASE_CSV_FILENAME, index=False)
+
+    print (f"download_entire_database_csv completed: Saved entire database into {ENTIRE_DATABASE_CSV_FILENAME}")
+
+PREDICTION_TABLE_NAME = 'predict_test'
+def save_predictions_to_db(prediction_array, cursor, location_code):
+    """
+    prediction array: 2d array formated like food, date1, date2, date3
+    location: must be in LOCATION_CODES
+    cursor: connection to database
+    """
+    # Write each prediction to the database
+    for prediction in prediction_array:
+        # write each date
+        food_name = prediction[0]
+        assert isinstance(food_name, str), f"Expected datetime object, got {type(food_name)} instead."
+        for i in range(1, NUM_PREDICTIONS + 1):
+            date = prediction[i]
+            date = datetime (date.year, date.month, date.day)
+            assert isinstance(date, datetime), f"Expected datetime object, got {type(date)} instead."
+            instr = f"INSERT INTO {PREDICTION_TABLE_NAME} (Recipe, [Date], [Location]) VALUES (?, ?, ?)"
+            cursor.execute(instr, food_name, date, location_code) 
+
+    print (f"done adding predictions to {PREDICTION_TABLE_NAME}")
+
+def get_predictions_from_db(food_name):
+    """ read from predictions """
+    
+    # Connect to database
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    query = f"SELECT * FROM {PREDICTION_TABLE_NAME} WHERE Recipe='{food_name}' ORDER BY [Date]"
+
+    # Execute query
+    print(f'get_predictions_from_db searching for {food_name} with query {query}')
+    cursor.execute(query)
+
+    # Fetch results of query
+    rows = cursor.fetchall()
+
+    # Extract data and store into a list in the details page format
+    predictions = []
+    for row in rows:
+        date = row.Date.strftime("%d %B '%y").lstrip('0')
+        predictions.append([date, LOCATION_CODES[row.Location]])
+
+    # Close the connection
+    connection.close()
+    
+    print ("done fetching predictions")
+    return predictions

@@ -4,7 +4,7 @@
 from datetime import datetime, timedelta
 from flask import Flask, request, render_template
 from searchdb import load_menu_details, load_menu_home, MFilters
-from predict_dates import predict_future_date
+from predict_dates import get_predictions
 
 app = Flask(__name__)
 
@@ -81,7 +81,7 @@ def details():
                 past_menu_filters = ''.join(filters_list)
                 past_menu = load_menu_details(food_name, past_menu_filters)
 
-                prediction_entry = predict_future_date (food_name)
+                prediction_entry = get_predictions (food_name)
 
                 return render_template('details.html', future_menu = future_menu, past_menu = past_menu, 
                                        search = food_name, filters = filters_str, today_str = today_str, 
@@ -98,10 +98,9 @@ def details():
 
     else:
         # Somehow got '' (can happen when user manually types in URL)
-        loaded_details = []
         food_name = 'Error retrieving food name. No'
 
-    prediction_entry = predict_future_date (food_name)
+    prediction_entry = get_predictions (food_name)
 
     return render_template('details.html', search = food_name, future_menu = future_menu, 
                            past_menu = past_menu, today_str = today_str, tmr_str = tmr_str, 
@@ -155,11 +154,11 @@ def overview():
 def about():
     return render_template('about.html')
 
-# # for running locally
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0', debug=True)
-
-# attempt to fix 503 error
+# for running locally
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8000))  # Use the PORT environment variable set by Azure
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', debug=True)
+
+# # attempt to fix 503 error
+# if __name__ == '__main__':
+#     port = int(os.environ.get('PORT', 8000))  # Use the PORT environment variable set by Azure
+#     app.run(host='0.0.0.0', port=port, debug=True)

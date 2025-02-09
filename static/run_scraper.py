@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 import pyodbc 
 from scraper import scraper_main, get_logger
 from db_connection_info import CONNECTION_INFO # file ON MY COMPUTER storing login credentials
+from predict_future_date import make_predictions
+from searchdb import download_database_csv, ENTIRE_DATABASE_CSV_FILENAME
 
 # import methods from searchdb: Add the parent directory to the system path to access it
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -84,8 +86,21 @@ for i in range(0, CHECK_DAYS_AHEAD + 1):
     date += timedelta(days=1)
     table_name = get_table_name(date)
 
-# commit writes and close
+# commit writes
 connection.commit()
+logger.debug(f"Done writing data")
+
+# Convert Database into CSV for training models
+# download_database_csv(cursor)
+
+# Re-train models with new data and save results into database
+make_predictions(cursor, ENTIRE_DATABASE_CSV_FILENAME)
+
+# commit writes
+connection.commit()
+logger.debug(f"Done predicting data and saving to database")
+
+# close the connection
 connection.close()
 
 # log success
