@@ -155,6 +155,11 @@ def overview():
 def about():
     return render_template('about.html')
 
-# for running locally
+# # for running locally
+# if __name__ == '__main__':
+#     app.run(host='0.0.0.0', debug=True)
+
+# attempt to fix 503 error
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    port = int(os.environ.get('PORT', 8000))  # Use the PORT environment variable set by Azure
+    app.run(host='0.0.0.0', port=port, debug=True)
