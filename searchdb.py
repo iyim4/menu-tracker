@@ -6,6 +6,7 @@
 from datetime import datetime, timedelta
 from enum import Enum
 import pyodbc
+import pytz
 import os
 
 # mapping from database codes to strings
@@ -65,8 +66,7 @@ def load_menu_home(food_name: str, filters: str):
 
     # Extract data and store into a list, in the home page format
     loaded_menu = []
-    today = datetime.today()
-    today = datetime(today.year, today.month, today.day)
+    today = get_today()
     tomorrow = today + timedelta(days=1)
     for row in rows:
         date = row.Date
@@ -161,7 +161,8 @@ def get_connection():
     return pyodbc.connect(connection_string)
 
 # TODO shorten function (142 lines, yikes!)
-def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: pyodbc.Cursor):
+def get_filtered_query(filters: str, food_name: str, exact_match: bool, 
+                       cursor: pyodbc.Cursor):
     """ returns SQL query string for database using filters 
 
     :param filters: string determining selection filters. assume already validated.
@@ -222,9 +223,10 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: 
     # else, search all locations
     
     # Add time filters and return
-    today = datetime.today()
+    today = get_today()
     if filters[MFilters.TIME.value] == f'{MFilters.TIME_SHORT.value}':
         # TIME_SHORT case: searches to up to MFilters.TIME_SHORT_LIMIT - 1 days ahead
+        # For the main menu search
         start_date = today
         end_date = (today + timedelta(days=MFilters.TIME_SHORT_LIMIT.value - 1))
         if start_date.month == end_date.month:
@@ -250,7 +252,7 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: 
             return f'{table1} UNION {table2} {order_clause}'
         
     elif filters[MFilters.TIME.value] == f'{MFilters.TIME_FUTURE.value}':
-        # TIME_FUTURE case: searches everything after today
+        # TIME_FUTURE case: searches today and beyond
         start_date = today
         today_str = today.strftime("%m/%d/%Y")
         where_clause.append(f"([Date] >= '{today_str}')")
@@ -274,7 +276,7 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool, cursor: 
     
     else:
         # TIME ALL case: searches from all tables
-        today = datetime.today()
+        today = get_today()
         start_date = datetime(2024, 7, 1) # database won't contain any data before july 2024
         end_date = datetime(today.year, today.month, 1)
         temp_date = start_date
@@ -314,3 +316,17 @@ def get_table_name(date: datetime):
 def is_valid_tname(cursor: pyodbc.Cursor, table_name: str):
     """ Returns true if table_name is a valid table name (present in cursor's database), false otherwise """
     return cursor.tables(table=table_name, tableType='TABLE').fetchone() is not None
+
+def get_today() -> datetime:
+    """ Returns the today's date, Austin time """
+    # Get the current time in UTC
+    utc_now = datetime.now(pytz.utc)
+
+    # Convert the current time to CST
+    cst_now = utc_now.astimezone(pytz.timezone('US/Central'))
+
+    # Extract just the date
+    cst_today = datetime(cst_now.year, cst_now.month, cst_now.day)
+
+    # Print the new datetime object
+    return cst_today
