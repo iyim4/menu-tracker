@@ -65,7 +65,11 @@ def load_menu_home(food_name: str, filters: str):
     cursor = connection.cursor()
 
     # Get the SQL query
-    query = get_filtered_query(filters, food_name, False, cursor)
+    try:
+        query = get_filtered_query(filters, food_name, False, cursor)
+    except:
+        print ("an error occured in get_filtered_query")
+        exit()
 
     # Execute query
     print(f'load_menu_home searching for {food_name} with filters {filters} and query {query}')
@@ -104,7 +108,11 @@ def load_menu_details(food_name: str, filters: str):
     cursor = connection.cursor()
 
     # Get the SQL query
-    query = get_filtered_query(filters, food_name, True, cursor)
+    try:
+        query = get_filtered_query(filters, food_name, True, cursor)
+    except:
+        print ("an error occured in get_filtered_query")
+        exit()
 
     # Execute query
     print(f'load_menu_details searching for {food_name} with filters {filters} and query {query}')
