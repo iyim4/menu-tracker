@@ -306,7 +306,7 @@ def get_filtered_query(filters: str, food_name: str, exact_match: bool,
         select_clauses = [f'SELECT * from {table} WHERE {where_clause_partial}' for table in tables]
 
         # add this month's table and date filter
-        where_clause.append(f"([Date] >= '{today.strftime("%m/%d/%Y")}')")
+        where_clause.append(f"([Date] >= '{today.strftime('%m/%d/%Y')}')")
         where_clause_final = ' AND '.join(where_clause)
         select_clauses.append(f'SELECT * from {get_table_name(temp_date)} WHERE {where_clause_final}')
 
